@@ -160,6 +160,22 @@ class AuthRepository {
 
   Future<void> signOut() => _auth.signOut();
 
+  /// Whether the login token carries the `staff` flag the security rules
+  /// check. `npm run approve` sets it, but a phone keeps its old token for
+  /// up to an hour, so a missing flag triggers one refresh before giving up.
+  Future<bool> hasStaffAccess() async {
+    final user = _auth.currentUser;
+    if (user == null) return false;
+    try {
+      if ((await user.getIdTokenResult()).claims?['staff'] == true) {
+        return true;
+      }
+      return (await user.getIdTokenResult(true)).claims?['staff'] == true;
+    } on FirebaseAuthException {
+      return false;
+    }
+  }
+
   /// Runs a Firebase Auth call and turns its error codes into messages
   /// people can act on.
   Future<T> _guard<T>(Future<T> Function() call) async {
