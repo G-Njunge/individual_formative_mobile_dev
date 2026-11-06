@@ -11,11 +11,11 @@ Built with Flutter, Riverpod and Firebase (Authentication and Cloud Firestore), 
 | 1 | Theme, design tokens, shared components, component gallery | Done |
 | 2 | Firebase set-up, sign in and sign up, email verification, forgot password, onboarding, role-based routing | Done (needs `flutterfire configure`, see below) |
 | 3 | Student reporting: New report with photos, Report submitted, Home, Browse, Report details | Done (redeploy rules and indexes, see below) |
-| 4 | Staff dashboard and status updates, notification fan-out | Not started |
+| 4 | Staff dashboard, All reports, Review and update (status, assignee, note, after photo, duplicate), notification fan-out | Done (redeploy rules, re-run `npm run approve` for existing staff) |
 | 5 | Me too, notifications, profile, confirm or reopen | Not started |
 | 6 | Full security rules, indexes, seed data, remaining tests, final README | Not started |
 
-Screens that belong to later milestones (Notifications, Profile, the staff side) are temporary placeholders, so routing and sign-in can already be tried end to end.
+Screens that belong to Milestone 5 (Notifications and both Profile tabs) are temporary placeholders, so routing and sign-in can already be tried end to end.
 
 ## Setup
 
@@ -68,10 +68,20 @@ In Chrome the app shows a "not set up for this platform" message. To support web
 
 ### Making a staff account usable
 
-Staff sign up with an `@alueducation.com` email and a Staff ID. After verifying their email they see "Waiting for approval" until an admin approves them. Either:
+Staff sign up with an `@alueducation.com` email and a Staff ID. After verifying their email they see "Waiting for approval" until an admin approves them with the script:
 
-- **Console:** Firestore → `users` → the staff member's document. Set `approved` to `true` and add a string field `team` (for example `Plumbing`). The app moves on by itself.
-- **Script:** `cd tool/admin && npm install && npm run approve -- jean.h@alueducation.com "Plumbing"` (needs the service-account key described below).
+```
+cd tool/admin
+npm install
+npm run approve -- jean.h@alueducation.com "Plumbing"
+```
+
+It needs the service-account key described below, and does two things:
+
+1. Puts a `staff: true` flag on the account's login token (a Firebase **custom claim**). The security rules check this flag before letting anyone change a report. Only the Admin SDK can set claims, so nobody can give themselves staff access.
+2. Sets `approved: true` and the team on the profile, so the app moves past "Waiting for approval" by itself.
+
+**Setting `approved` by hand in the console is no longer enough.** The staff member would get to the dashboard, but saving an update would be refused. Why the flag lives on the token rather than in the profile is explained in [Staff updates and notifications](#staff-updates-and-notifications). Staff approved before Milestone 4 need the script run once more. The app refreshes its token when the dashboard opens, so they don't need to sign out.
 
 Users cannot approve themselves or change their own role. The security rules block it.
 
@@ -83,7 +93,8 @@ Users cannot approve themselves or change their own role. The security rules blo
 |---|---|
 | `npm run cleanup:dry` | Lists accounts unverified for more than 24 hours |
 | `npm run cleanup` | Deletes those accounts and their profiles |
-| `npm run approve -- <email> "<team>"` | Approves a staff account |
+| `npm run approve -- <email> "<team>"` | Approves a staff account (staff flag on the login, `approved` and team on the profile) |
+| `npm run verify -- <email>` | Marks a test account's email as verified without the link, for made-up addresses whose inbox you can't open |
 
 They need a key: Firebase console → Project settings → Service accounts → **Generate new private key**, saved as `tool/admin/service-account.json`. The key gives full access to the project. It is in `.gitignore`. Never commit it or put it in the app.
 
@@ -120,6 +131,7 @@ lib/
     auth/          data/ (AppUser, AuthRepository)  application/ (providers, controllers)  presentation/ (screens)
     onboarding/    application/ (seen flag)  presentation/ (carousel)
     reports/       data/ (Report, ReportRepository, PhotoPicker)  application/ (providers, filters, New report controller)  presentation/ (Home, Browse, New report, Submitted, Details)
+    staff/         data/ (StaffRepository, StaffUpdateDraft)  application/ (queue and stats, save controller)  presentation/ (Dashboard, All reports, Review and update)
 ```
 
 - **data/**: repositories are the only code that talks to Firebase. They return app models and throw readable errors (`UserFacingException`) instead of Firebase error codes.
@@ -169,7 +181,34 @@ Any signed-in user can read any report, so whatever a report stores is effective
 - The only link is a private record, `users/{uid}/reports/{reportId}`, written in the same transaction. Only the reporter can read it, and it can't be created for someone else's report or changed later.
 - "My reports" and Home join two live sources: named reports (`where reporterId == uid`) and the anonymous ones listed in the private records (`whereIn` on the document id, in groups of 30, Firestore's limit).
 
-What this doesn't hide: the Firebase project owner can still see the private records in the console, which is normal for campus systems (abuse can be followed up). Staff updates in Milestone 4 will reach anonymous reporters without staff learning who they are.
+What this doesn't hide: the Firebase project owner can still see the private records in the console, which is normal for campus systems (abuse can be followed up).
+
+Staff can't notify an anonymous reporter directly, because they don't know who it is. Instead the reporter's own app, which already follows their anonymous reports through the private records, turns each new timeline entry into a notification (Milestone 5). Each timeline entry stores `previousStatus` so the app can tell "is now In progress" from "left a note". Like every notification in the app, these show inside the app; push messages would need Cloud Functions.
+
+### Staff updates and notifications
+
+"Save update" writes everything in one **batch**:
+- the report's new status and assignee;
+- a timeline entry in `reports/{id}/updates`;
+- the after photo, if any (`reports/{id}/photos/after`, compressed like the others);
+- a notification in `users/{uid}/notifications` for the named reporter and every supporter, but not the staff member who made the change.
+
+Students therefore never see a status change without its notification, or the other way round. No Cloud Function is needed. A batch takes up to 500 writes, so only a report with more than about 500 supporters spills into follow-up batches, and those are sent only after the main one succeeds.
+
+Notifications store facts (type, ticket, status, note), not sentences, so the Notifications screen can word and style them ("#1042 is now **In progress**").
+
+**Why staff are recognised by a token flag.** A rule that checks "is this person approved staff?" by reading their profile costs one document lookup per write. Firestore allows 20 lookups per batch, so a report with about 15 supporters would make saving fail. The `staff` custom claim is part of the login token, which the rules read without any lookup, so saving works however many people back a report. The trade-off is that approval goes through `npm run approve` instead of a console edit.
+
+**What staff can change.** The rules let staff change only the status, the assignee, the after-photo flag and the duplicate link. They can't edit what the student wrote, the ticket number or the Me too count. Timeline entries must carry the staff member's own id and can never be edited afterwards.
+
+**Duplicates.** "Duplicate" asks for the original ticket number. It resolves this report with the note "Duplicate of #1040 … Follow that ticket for updates" and stores a link (`duplicateOf`), which Report details shows as a card that opens the original. Its reporter and supporters are notified like any other update.
+
+**The queue.** The dashboard counts and queues come from the same 200 most recent reports as Browse, filtered on the phone:
+- **New:** still "Submitted".
+- **Mine:** assigned to you and not resolved.
+- **All:** every report.
+
+New and Mine put the most urgent first, then the most backed, then the oldest, so what has waited longest isn't buried. "Resolved this week" uses the time of each report's last update.
 
 ### Fonts
 
@@ -182,9 +221,15 @@ flutter analyze
 flutter test
 ```
 
-So far: validators, time formatting, the `AppUser` and `Report` models, `AuthRepository` and `ReportRepository` (with `firebase_auth_mocks` and `fake_cloud_firestore`), search, filters, sort and the progress timeline, every routing rule, widget tests for the shared components, and a widget test of the New report form (validation, photo, submit).
+So far:
+- validators and time formatting;
+- the `AppUser` and `Report` models;
+- `AuthRepository`, `ReportRepository` and `StaffRepository`, with `firebase_auth_mocks` and `fake_cloud_firestore`. The staff tests cover the notification fan-out, anonymous reporters, more than 500 supporters, after photos and duplicates;
+- search, filters, sort, the timeline, the staff queue and the stats;
+- every routing rule;
+- widget tests for the shared components, the New report form and Review and update.
 
-The security rules are not unit tested yet. That needs the Firestore emulator, which needs Java, and is planned for Milestone 6.
+The security rules were checked against sample requests with Firebase's rules test API (allowed and refused cases for students, staff and notifications), and they compile with `firebase deploy --only firestore:rules --dry-run`. A repeatable rules test suite is planned for Milestone 6.
 
 ## Assignment checklist
 
@@ -192,16 +237,17 @@ The security rules are not unit tested yet. That needs the Firestore emulator, w
 |---|---|---|
 | Submit reports with description, category, optional photos | [new_report_screen.dart](lib/features/reports/presentation/new_report_screen.dart), `ReportRepository.createReport` | Done |
 | Browse, search, filter, details, track status | Browse, Home, Report details with the live progress timeline | Done |
-| Two roles: students and authorised staff | `AppUser.role`, staff approval, role-based routing | Done |
+| Two roles: students and authorised staff | `AppUser.role`, staff approval (custom claim), role-based routing, staff dashboard and Review and update | Done |
 | Modern state management (Riverpod), logic outside widgets | `application/` providers and controllers | Done for auth and reports; continues |
 | Firebase Authentication (email and password) | `AuthRepository`, verification, password reset | Done |
-| Cloud Firestore | `users`, `reports`, `reports/{id}/photos`, `reports/{id}/updates`, `counters` | Done for students; staff writes in Milestone 4 |
+| Cloud Firestore | `users`, `reports`, `reports/{id}/photos`, `reports/{id}/updates`, `users/{uid}/notifications`, `counters` | Done |
 | Basic widgets and layouts | all screens | Done so far |
 | Navigation | go_router, nav-bar shells, redirects | Done |
 | Forms with validation | sign in, sign up (email domain, live password checklist, confirm), New report (required fields, category, 300-character description, up to 3 photos) | Done |
 | Reusable components | `core/widgets`, component gallery | Done |
 | Asynchronous programming: loading, empty, error states | `AsyncValueView`, `LoadingState`, `EmptyState`, `ErrorState` | Components done; used on every data screen |
-| Security rules | [firestore.rules](firestore.rules) (accounts, report creation, photos, counter) | In progress, finished in Milestone 6 |
+| Security rules | [firestore.rules](firestore.rules) (accounts, report creation, photos, counter, staff updates, timeline, notifications) | In progress, finished in Milestone 6 |
 | Extra features: anonymous reports (no id or name stored), urgency levels, readable ticket numbers, sort | New report, Browse | Done |
-| Extra features: Me too, staff notes, notifications, confirm or reopen | Me too count and staff notes already show on Report details | Milestones 4 and 5 |
+| Extra features: staff notes, assignee, after photo, duplicates, notification fan-out | Review and update, `StaffRepository.saveUpdate` | Done |
+| Extra features: Me too, Notifications screen, confirm or reopen | Me too count and staff notes already show on Report details | Milestone 5 |
 | Extra: one-time email verification with 24-hour expiry | auth feature, admin script | Done |
