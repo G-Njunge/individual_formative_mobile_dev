@@ -21,6 +21,13 @@ class Routes {
   static const notifications = '/notifications';
   static const profile = '/profile';
 
+  /// Report details and "Report submitted" sit above the tabs (no nav bar).
+  static const reportBase = '/report';
+  static const reportDetailsPattern = '$reportBase/:id';
+  static const reportSubmittedPattern = '$reportBase/:id/submitted';
+  static String reportDetails(String id) => '$reportBase/$id';
+  static String reportSubmitted(String id) => '$reportBase/$id/submitted';
+
   // Staff.
   static const staffDashboard = '/staff';
   static const staffReports = '/staff/reports';
@@ -30,6 +37,12 @@ class Routes {
   static const gallery = '/debug/gallery';
 
   static const signedOutRoutes = {onboarding, signIn, signUp};
-  static const studentAreas = [home, reports, notifications, profile];
+  static const studentAreas = [
+    home,
+    reports,
+    notifications,
+    profile,
+    reportBase,
+  ];
   static const staffAreas = [staffDashboard];
 }

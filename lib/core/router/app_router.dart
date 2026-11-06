@@ -8,6 +8,11 @@ import '../../features/auth/presentation/sign_in_screen.dart';
 import '../../features/auth/presentation/sign_up_screen.dart';
 import '../../features/onboarding/application/onboarding_provider.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
+import '../../features/reports/presentation/browse_reports_screen.dart';
+import '../../features/reports/presentation/home_screen.dart';
+import '../../features/reports/presentation/new_report_screen.dart';
+import '../../features/reports/presentation/report_details_screen.dart';
+import '../../features/reports/presentation/report_submitted_screen.dart';
 import '../debug/component_gallery_screen.dart';
 import '../debug/placeholder_screen.dart';
 import 'routes.dart';
@@ -61,21 +66,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         branches: [
           StatefulShellBranch(
             routes: [
-              GoRoute(
-                path: Routes.home,
-                builder: (_, _) =>
-                    const PlaceholderScreen(title: 'Home', milestone: 3),
-              ),
+              GoRoute(path: Routes.home, builder: (_, _) => const HomeScreen()),
             ],
           ),
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: Routes.reports,
-                builder: (_, _) => const PlaceholderScreen(
-                  title: 'Campus reports',
-                  milestone: 3,
-                ),
+                builder: (_, _) => const BrowseReportsScreen(),
               ),
             ],
           ),
@@ -107,11 +105,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Full-screen pages above the student tabs.
       GoRoute(
         path: Routes.newReport,
-        builder: (_, _) => const PlaceholderScreen(
-          title: 'New report',
-          milestone: 3,
-          closable: true,
-        ),
+        builder: (_, _) => const NewReportScreen(),
+      ),
+      GoRoute(
+        path: Routes.reportDetailsPattern,
+        builder: (_, state) =>
+            ReportDetailsScreen(reportId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: Routes.reportSubmittedPattern,
+        builder: (_, state) =>
+            ReportSubmittedScreen(reportId: state.pathParameters['id']!),
       ),
 
       // Staff area.
