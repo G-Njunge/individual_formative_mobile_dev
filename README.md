@@ -9,13 +9,13 @@ Built with Flutter, Riverpod and Firebase (Authentication and Cloud Firestore), 
 | Milestone | Scope | Status |
 |---|---|---|
 | 1 | Theme, design tokens, shared components, component gallery | Done |
-| 2 | Firebase set-up, sign in and sign up, email verification, forgot password, onboarding, role-based routing | Done (needs `flutterfire configure`, see below) |
-| 3 | Student reporting: New report with photos, Report submitted, Home, Browse, Report details | Done (redeploy rules and indexes, see below) |
-| 4 | Staff dashboard, All reports, Review and update (status, assignee, note, after photo, duplicate), notification fan-out | Done (redeploy rules, re-run `npm run approve` for existing staff) |
-| 5 | Me too, Notifications, Profile (student and staff), confirm or reopen, announcements, notification settings, Help and FAQ | Done (redeploy rules) |
-| 6 | Full security rules, indexes, seed data, remaining tests, final README | Not started |
+| 2 | Firebase set-up, sign in and sign up, email verification, forgot password, onboarding, role-based routing | Done |
+| 3 | Student reporting: New report with photos, Report submitted, Home, Browse, Report details | Done |
+| 4 | Staff dashboard, All reports, Review and update (status, assignee, note, after photo, duplicate), notification fan-out | Done |
+| 5 | Me too, Notifications, Profile (student and staff), confirm or reopen, announcements, notification settings, Help and FAQ | Done |
+| 6 | Security rules reviewed and tested (62 cases), indexes, seed data, remaining tests, this README | Done |
 
-Every screen in the design is built. Milestone 6 reviews the rules and indexes as a whole and adds seed data.
+Every screen in the design is built, plus a few the design implies (Staff All reports, staff Profile, Followed reports, Notification settings, Help and FAQ).
 
 ## Setup
 
@@ -54,6 +54,8 @@ firebase deploy --only firestore
 
 Until the rules are deployed, a database created in production mode refuses every read and write, and sign up will fail. Run it again whenever `firestore.rules` or `firestore.indexes.json` changes. A new index takes a few minutes to build; until then "My reports" and Home show an error.
 
+[firestore.indexes.json](firestore.indexes.json) has one composite index, `reporterId` + `createdAt`, for "My reports". Every other query either sorts on a single field or only compares fields for equality, and Firestore indexes those automatically. The file also switches indexing off for the photo bytes (`photos.data`): nothing ever searches by them, and indexing up to 700 KB per photo would only cost storage.
+
 ### 5. Run
 
 Firebase is configured for **Android** (and iOS, which needs a Mac), not for web or Windows. Start an Android emulator or plug in a phone first:
@@ -65,6 +67,28 @@ flutter run
 ```
 
 In Chrome the app shows a "not set up for this platform" message. To support web, run `flutterfire configure --project=formative2-b25e3 --platforms=android,ios,web`.
+
+### 6. Sample data (optional)
+
+To see the app full of content, as in the design:
+
+```
+cd tool/admin
+npm install
+npm run seed -- --password "Choose-a-password-1"
+```
+
+This creates verified demo accounts with the password you give:
+- students: `demo.amani@alustudent.com`, `demo.bea@alustudent.com`, `demo.chris@alustudent.com`, `demo.diane@alustudent.com`;
+- an approved staff member: `demo.jean@alueducation.com` (Plumbing).
+
+It also creates five reports at every status ("Leaking tap in the Block C washroom" and the others from the design), one of them anonymous, with:
+- timeline entries;
+- Me toos;
+- the notifications staff updates would have written;
+- a campus announcement.
+
+Ticket numbers come from the real counter, like the app's. `npm run seed:clear` removes everything it created; every seeded id starts with `seed-`. Sample data is never built into the app.
 
 ### Making a staff account usable
 
@@ -81,7 +105,7 @@ It needs the service-account key described below, and does two things:
 1. Puts a `staff: true` flag on the account's login token (a Firebase **custom claim**). The security rules check this flag before letting anyone change a report. Only the Admin SDK can set claims, so nobody can give themselves staff access.
 2. Sets `approved: true` and the team on the profile, so the app moves past "Waiting for approval" by itself.
 
-**Setting `approved` by hand in the console is no longer enough.** The staff member would get to the dashboard, but saving an update would be refused. Why the flag lives on the token rather than in the profile is explained in [Staff updates and notifications](#staff-updates-and-notifications). Staff approved before Milestone 4 need the script run once more. The app refreshes its token when the dashboard opens, so they don't need to sign out.
+**Setting `approved` by hand in the console is no longer enough.** The staff member would get to the dashboard, but saving an update would be refused. Why the flag lives on the token rather than in the profile is explained in [Staff updates and notifications](#staff-updates-and-notifications). The app refreshes its token when the dashboard opens, so a newly approved staff member doesn't need to sign out.
 
 Users cannot approve themselves or change their own role. The security rules block it.
 
@@ -95,8 +119,11 @@ Users cannot approve themselves or change their own role. The security rules blo
 | `npm run cleanup` | Deletes those accounts and their profiles |
 | `npm run approve -- <email> "<team>"` | Approves a staff account (staff flag on the login, `approved` and team on the profile) |
 | `npm run verify -- <email>` | Marks a test account's email as verified without the link, for made-up addresses whose inbox you can't open |
+| `npm run seed -- --password "<password>"` | Adds the sample data and demo accounts (see above) |
+| `npm run seed:clear` | Removes the sample data and demo accounts |
+| `npm run test:rules` | Checks `firestore.rules` against 62 allowed and refused requests (see [Testing](#testing)) |
 
-They need a key: Firebase console → Project settings → Service accounts → **Generate new private key**, saved as `tool/admin/service-account.json`. The key gives full access to the project. It is in `.gitignore`. Never commit it or put it in the app.
+All but `test:rules` need a key: Firebase console → Project settings → Service accounts → **Generate new private key**, saved as `tool/admin/service-account.json`. The key gives full access to the project. It is in `.gitignore`. Never commit it or put it in the app.
 
 ## Accounts and verification
 
@@ -144,11 +171,45 @@ lib/
 
 **Design system.** Every colour, shadow, radius and text style lives in [tokens.dart](lib/core/theme/tokens.dart) and [text_styles.dart](lib/core/theme/text_styles.dart). Screens never hard-code them. The neumorphic look comes from one widget, [NeuSurface](lib/core/widgets/neu_surface.dart): raised surfaces use two `BoxShadow`s, and pressed surfaces use a small custom painter, because Flutter has no inset shadow. Dark is the original design and the default. A matching light theme keeps the same roles, with accent text colours darkened to stay readable.
 
+## Data model
+
+| Path | What it holds | Written by |
+|---|---|---|
+| `users/{uid}` | name, email, role, and for staff `staffId`, `approved`, `team` | the person at sign up (name can change later); `approved` and team by `npm run approve` |
+| `users/{uid}/reports/{reportId}` | private link to a report sent anonymously, plus `seenAt` | the reporter |
+| `users/{uid}/following/{reportId}` | reports the student backs | the student, with Me too |
+| `users/{uid}/notifications/{id}` | type, report, ticket, status, note, read | staff, when they save an update |
+| `reports/{id}` | ticket number, title, description, category, location, urgency, status, reporter (named only), anonymous, photo count, assignee, Me too count, after-photo flag, duplicate link, confirmed, times | the student creates it; staff and the reporter change specific fields |
+| `reports/{id}/photos/{0,1,2,after}` | compressed photo bytes | the student (with the report); staff (after photo) |
+| `reports/{id}/updates/{id}` | the timeline: status, previous status, note, who | staff; the reporter when reopening |
+| `reports/{id}/supporters/{uid}` | one per Me too | the student |
+| `announcements/{id}` | title, body, who | staff |
+| `counters/reports` | the last ticket number handed out | the student's app, in the same transaction as the report |
+
+Compared with the starting data model in the brief:
+- photos are Firestore documents, not Storage files, because Storage needs the paid plan;
+- anonymous reports store no reporter id;
+- `following`, `seenAt`, `confirmed`, `hasAfterPhoto`, `duplicateOf` and `previousStatus` were added for the features below.
+
+## Security rules
+
+[firestore.rules](firestore.rules) starts from "deny everything", and each collection then opens only what the app needs. Every read and write requires sign in, and almost everything requires a verified email.
+
+| Who | Can | Can't |
+|---|---|---|
+| Anyone signed out | nothing | read or write anything |
+| A new user | create their own profile with the role their email domain allows; staff always start unapproved | pick another role, approve themselves, change their role or email later |
+| A verified student | create reports as themselves (anonymous ones carry no id or name); add up to 3 photos in the same write; Me too once per report; confirm or reopen their own resolved report; read and mark their own notifications | change a report's status or wording; back their own or a resolved report; read other students' profiles, notifications, private links or who backed a report; post announcements |
+| Approved staff (`staff` token flag) | change a report's status, assignee, after photo and duplicate link; add timeline entries in their own name; notify students; read supporters; post announcements | edit what the student wrote, the ticket number or the Me too count; write a timeline entry as someone else |
+| Unapproved staff | read reports | change anything (the app also keeps them on "Waiting for approval") |
+
+The rules check whole writes, not just single fields. For example, the counter can only go up by one, and the report must carry the counter's new number. The Me too count can only move by one, in the same write that adds or removes that student's supporter record. Photos and the anonymous private link can only be written in the same write that creates their report. These checks use `getAfter`/`existsAfter`, which see the database as it will be once the whole write succeeds.
+
 ## Decisions and trade-offs
 
 ### Photos without Firebase Storage
 
-New Firebase projects need the paid Blaze plan to use Storage, so this project stays on the free Spark plan and stores photos in Firestore instead (Milestone 3). Each photo is compressed on the phone (about 1024 px wide, JPEG quality 60, usually 100 to 250 KB) and saved as a `Blob` in its own document under `reports/{id}/photos/`. That keeps every document well under Firestore's 1 MiB limit, and report lists never download photos. On Blaze, only the photo repository would change.
+New Firebase projects need the paid Blaze plan to use Storage, so this project stays on the free Spark plan and stores photos in Firestore instead. Each photo is compressed on the phone (about 1024 px wide, JPEG quality 60, usually 100 to 250 KB) and saved as a `Blob` in its own document under `reports/{id}/photos/`. That keeps every document well under Firestore's 1 MiB limit, and report lists never download photos. On Blaze, only the photo repository would change.
 
 ### Search, filters and sort
 
@@ -253,16 +314,42 @@ flutter analyze
 flutter test
 ```
 
-So far:
+146 tests:
 - validators and time formatting;
 - the `AppUser` and `Report` models;
 - `AuthRepository`, `ReportRepository`, `StaffRepository` and `NotificationRepository`, with `firebase_auth_mocks` and `fake_cloud_firestore`. The staff tests cover the notification fan-out, anonymous reporters, more than 500 supporters, after photos and duplicates; the report tests cover Me too, confirm and reopen;
 - the notification feed: ordering, settings, "Is it fixed?" and phone-built notifications for anonymous reports;
 - search, filters, sort, the timeline, the staff queue and the stats;
 - every routing rule;
-- widget tests for the shared components, the New report form, Review and update, Report details (Me too and taking it back, confirm, reopen) and Notifications.
+- widget tests for the shared components and the main screens: Create account (password checklist, validation, account creation), New report, Browse (search, chips, My reports), the staff dashboard (counts and queues), Review and update, Report details (Me too and taking it back, confirm, reopen) and Notifications.
 
-The security rules were checked against sample requests with Firebase's rules test API (45 allowed and refused cases: report creation, staff updates, notifications, Me too, confirm, reopen, announcements), and they compile with `firebase deploy --only firestore:rules --dry-run`. A repeatable rules test suite is planned for Milestone 6.
+### Security rules
+
+```
+cd tool/admin
+npm run test:rules
+```
+
+The rules are tested with 62 cases in [tool/admin/rules-test/cases.js](tool/admin/rules-test/cases.js). Each case is one request, saying who sends it, what it does, where, and with which data, and states whether the rules must allow or refuse it. Most cases are refusals, such as:
+- an anonymous report carrying an id;
+- a ticket number that didn't come from the counter;
+- staff editing the title;
+- a Me too count jumping by two;
+- a reopen entry naming the student.
+
+The cases run on Firebase's rules test API, so Google's servers evaluate the local `firestore.rules` without deploying it or writing anything. The usual alternative is the Firestore emulator, which needs Java; this works without it. The script signs in with your Firebase CLI login (`firebase login`).
+
+One adjustment: JSON can't carry raw bytes, so the photo cases send text. The copy of the rules sent for testing accepts text where the real rules require bytes; every other line is tested exactly as written.
+
+`firebase deploy --only firestore --dry-run` also compiles the rules and checks the indexes without deploying.
+
+## Limitations and next steps
+
+- **No push notifications.** They need Cloud Functions (paid Blaze plan). Notifications appear inside the app and update live while it is open. With Blaze, a function on `users/{uid}/notifications` could send them through Firebase Cloud Messaging.
+- **Browse, search and the staff dashboard use the 200 most recent reports**, filtered on the phone (no full-text search in Firestore). A large campus would need a search service and paged queries.
+- **Unverified accounts are cleaned up by a script**, not on a schedule, because scheduled functions need Blaze.
+- **Firebase is configured for Android and iOS only.** Web works after `flutterfire configure --platforms=web`.
+- **Revoking staff access** means removing the `staff` claim with the Admin SDK and setting `approved` to false; there is no script for it yet.
 
 ## Assignment checklist
 
@@ -278,9 +365,11 @@ The security rules were checked against sample requests with Firebase's rules te
 | Navigation | go_router, nav-bar shells, redirects | Done |
 | Forms with validation | sign in, sign up (email domain, live password checklist, confirm), New report (required fields, category, 300-character description, up to 3 photos) | Done |
 | Reusable components | `core/widgets`, component gallery | Done |
-| Asynchronous programming: loading, empty, error states | `AsyncValueView`, `LoadingState`, `EmptyState`, `ErrorState` | Components done; used on every data screen |
-| Security rules | [firestore.rules](firestore.rules) (accounts, report creation, photos, counter, staff updates, timeline, notifications, Me too, confirm or reopen, announcements) | In progress, finished in Milestone 6 |
+| Asynchronous programming: loading, empty, error states | `AsyncValueView`, `LoadingState`, `EmptyState`, `ErrorState` on every screen that loads data | Done |
+| Security rules | [firestore.rules](firestore.rules) (every collection; see [Security rules](#security-rules)), tested with 62 cases by `npm run test:rules` | Done |
 | Extra features: anonymous reports (no id or name stored), urgency levels, readable ticket numbers, sort | New report, Browse | Done |
 | Extra features: staff notes, assignee, after photo, duplicates, notification fan-out | Review and update, `StaffRepository.saveUpdate` | Done |
 | Extra features: Me too, notifications, confirm or reopen, announcements | Report details, Notifications, Profile | Done |
 | Extra: one-time email verification with 24-hour expiry | auth feature, admin script | Done |
+| Tests | 146 unit and widget tests (`flutter test`), 62 security-rule cases | Done |
+| Sample data, never shown in the UI | `npm run seed` / `npm run seed:clear` in [tool/admin/](tool/admin/) | Done |
