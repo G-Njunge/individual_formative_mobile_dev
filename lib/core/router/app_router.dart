@@ -13,11 +13,15 @@ import '../../features/reports/presentation/home_screen.dart';
 import '../../features/reports/presentation/new_report_screen.dart';
 import '../../features/reports/presentation/report_details_screen.dart';
 import '../../features/reports/presentation/report_submitted_screen.dart';
+import '../../features/notifications/application/notification_providers.dart';
+import '../../features/notifications/presentation/notifications_screen.dart';
+import '../../features/profile/presentation/profile_pages.dart';
+import '../../features/profile/presentation/staff_profile_screen.dart';
+import '../../features/profile/presentation/student_profile_screen.dart';
 import '../../features/staff/presentation/review_update_screen.dart';
 import '../../features/staff/presentation/staff_dashboard_screen.dart';
 import '../../features/staff/presentation/staff_reports_screen.dart';
 import '../debug/component_gallery_screen.dart';
-import '../debug/placeholder_screen.dart';
 import 'routes.dart';
 import 'session_redirect.dart';
 import 'shells.dart';
@@ -65,7 +69,12 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Student area, with the floating nav bar.
       StatefulShellRoute.indexedStack(
-        builder: (_, _, shell) => StudentShell(shell: shell),
+        builder: (_, _, shell) => Consumer(
+          builder: (_, ref, _) => StudentShell(
+            shell: shell,
+            hasUnread: ref.watch(hasUnreadNotificationsProvider),
+          ),
+        ),
         branches: [
           StatefulShellBranch(
             routes: [
@@ -84,10 +93,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.notifications,
-                builder: (_, _) => const PlaceholderScreen(
-                  title: 'Notifications',
-                  milestone: 5,
-                ),
+                builder: (_, _) => const NotificationsScreen(),
               ),
             ],
           ),
@@ -95,11 +101,18 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.profile,
-                builder: (_, _) => const PlaceholderScreen(
-                  title: 'Profile',
-                  milestone: 5,
-                  showAccount: true,
-                ),
+                builder: (_, _) => const StudentProfileScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'followed',
+                    builder: (_, _) => const FollowedReportsScreen(),
+                  ),
+                  GoRoute(
+                    path: 'notification-settings',
+                    builder: (_, _) => const NotificationSettingsScreen(),
+                  ),
+                  GoRoute(path: 'help', builder: (_, _) => const HelpScreen()),
+                ],
               ),
             ],
           ),
@@ -145,11 +158,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.staffProfile,
-                builder: (_, _) => const PlaceholderScreen(
-                  title: 'Profile',
-                  milestone: 5,
-                  showAccount: true,
-                ),
+                builder: (_, _) => const StaffProfileScreen(),
+                routes: [
+                  GoRoute(path: 'help', builder: (_, _) => const HelpScreen()),
+                ],
               ),
             ],
           ),

@@ -20,6 +20,9 @@ class Routes {
   static const newReport = '/reports/new';
   static const notifications = '/notifications';
   static const profile = '/profile';
+  static const followedReports = '/profile/followed';
+  static const notificationSettings = '/profile/notification-settings';
+  static const help = '/profile/help';
 
   /// Report details and "Report submitted" sit above the tabs (no nav bar).
   static const reportBase = '/report';
@@ -32,6 +35,7 @@ class Routes {
   static const staffDashboard = '/staff';
   static const staffReports = '/staff/reports';
   static const staffProfile = '/staff/profile';
+  static const staffHelp = '/staff/profile/help';
 
   /// "Review and update" sits above the staff tabs (no nav bar).
   static const staffReviewPattern = '/staff/report/:id';
