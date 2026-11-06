@@ -38,10 +38,22 @@ void main() {
   });
 
   group('password', () {
-    test('needs at least 8 characters', () {
+    test('names everything that is still missing', () {
       expect(Validators.password(''), 'Password is required');
-      expect(Validators.password('short'), 'Use at least 8 characters');
-      expect(Validators.password('longenough'), isNull);
+      expect(
+        Validators.password('short'),
+        'Add more characters, an uppercase letter, a number and a symbol',
+      );
+      expect(Validators.password('Campus2026'), 'Add a symbol');
+      expect(Validators.password('Campus-2026'), isNull);
+    });
+
+    test('checklist ticks off each requirement', () {
+      expect(PasswordRequirement.missingFrom('Campus-2026'), isEmpty);
+      expect(PasswordRequirement.missingFrom('campus-2026'), [
+        PasswordRequirement.uppercase,
+      ]);
+      expect(PasswordRequirement.missingFrom(''), PasswordRequirement.values);
     });
 
     test('confirm must match', () {

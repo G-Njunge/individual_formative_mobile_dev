@@ -172,4 +172,19 @@ void main() {
       'Something went wrong. Please try again.',
     );
   });
+
+  test('a password the Firebase policy refuses says what is missing', () {
+    expect(
+      AuthRepository.messageForPasswordPolicy(
+        'Missing password requirements: '
+        '[Password must contain a numeric character]',
+      ),
+      "This password doesn't meet the campus password rules: "
+      'Password must contain a numeric character.',
+    );
+    expect(
+      AuthRepository.messageForPasswordPolicy(null),
+      contains('mix of letters, numbers and symbols'),
+    );
+  });
 }

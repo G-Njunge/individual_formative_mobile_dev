@@ -12,6 +12,7 @@ import '../../../core/widgets/page_layout.dart';
 import '../../../core/widgets/password_strength_meter.dart';
 import '../application/auth_controllers.dart';
 import '../data/app_user.dart';
+import '../../../core/widgets/form_message.dart';
 import 'widgets/auth_widgets.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
@@ -137,6 +138,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 ),
                 const SizedBox(height: 9),
                 PasswordStrengthMeter(password: _password.text),
+                const SizedBox(height: 4),
+                PasswordChecklist(password: _password.text),
               ],
             ),
             NeuTextField(

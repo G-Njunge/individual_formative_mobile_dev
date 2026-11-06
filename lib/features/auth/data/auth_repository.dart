@@ -166,8 +166,28 @@ class AuthRepository {
     try {
       return await call();
     } on FirebaseAuthException catch (e) {
-      throw UserFacingException(messageForAuthError(e.code));
+      throw UserFacingException(
+        e.code == 'password-does-not-meet-requirements'
+            ? messageForPasswordPolicy(e.message)
+            : messageForAuthError(e.code),
+      );
     }
+  }
+
+  /// The password policy in the Firebase console can be stricter than the
+  /// app's checklist. Firebase lists what is missing in its message, e.g.
+  /// "Missing password requirements: [Password must contain a numeric
+  /// character]", so that list is passed on.
+  static String messageForPasswordPolicy(String? firebaseMessage) {
+    final missing = RegExp(r'\[(.*)\]')
+        .firstMatch(firebaseMessage ?? '')
+        ?.group(1)
+        ?.trim();
+    if (missing == null || missing.isEmpty) {
+      return "This password doesn't meet the campus password rules. "
+          'Try a longer one with a mix of letters, numbers and symbols.';
+    }
+    return "This password doesn't meet the campus password rules: $missing.";
   }
 
   static String messageForAuthError(String code) => switch (code) {

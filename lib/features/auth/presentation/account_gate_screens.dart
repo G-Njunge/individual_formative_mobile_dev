@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/router/routes.dart';
 import '../../../core/theme/text_styles.dart';
 import '../../../core/theme/tokens.dart';
 import '../../../core/widgets/async_states.dart';
@@ -12,7 +14,7 @@ import '../../../core/widgets/neu_card.dart';
 import '../../../core/widgets/page_layout.dart';
 import '../application/auth_controllers.dart';
 import '../application/auth_providers.dart';
-import 'widgets/auth_widgets.dart';
+import '../../../core/widgets/form_message.dart';
 
 /// Shared layout for the screens between signing in and using the app: logo
 /// tile, heading, explanation, optional detail card, buttons at the bottom.
@@ -127,6 +129,18 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     }
   }
 
+  /// Removes the unverified account and opens Create account. Removing it
+  /// signs the person out, and the router then sends signed-out people to
+  /// Sign in, so the router is grabbed first (this screen is gone by the
+  /// time the deletion finishes) and sent on to Create account.
+  Future<void> _useDifferentEmail() async {
+    final router = GoRouter.of(context);
+    await _controller.useDifferentEmail();
+    if (ref.read(authRepositoryProvider).currentUser == null) {
+      router.go(Routes.signUp);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(verifyEmailControllerProvider);
@@ -162,7 +176,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
         Center(
           child: TextLinkButton(
             label: 'Use a different email',
-            onPressed: state.isLoading ? null : _controller.useDifferentEmail,
+            onPressed: state.isLoading ? null : _useDifferentEmail,
           ),
         ),
       ],

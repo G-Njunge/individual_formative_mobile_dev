@@ -242,6 +242,24 @@ void main() {
     expect(Validators.passwordStrength('campus2026').bars, 2);
   });
 
+  testWidgets('PasswordChecklist marks what is done and what is not', (
+    tester,
+  ) async {
+    await tester.pumpApp(const PasswordChecklist(password: 'campus2026'));
+    expect(
+      find.bySemanticsLabel('At least 8 characters: done'),
+      findsOneWidget,
+    );
+    expect(
+      find.bySemanticsLabel('An uppercase letter (A-Z): not yet'),
+      findsOneWidget,
+    );
+    expect(
+      find.bySemanticsLabel('A symbol, such as ! # or @: not yet'),
+      findsOneWidget,
+    );
+  });
+
   group('AsyncValueView', () {
     Widget view(AsyncValue<List<int>> value) => AsyncValueView<List<int>>(
       value: value,

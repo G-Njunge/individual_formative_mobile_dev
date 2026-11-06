@@ -8,7 +8,7 @@ import '../../../core/widgets/async_states.dart';
 import '../../../core/widgets/buttons.dart';
 import '../../../core/widgets/neu_text_field.dart';
 import '../application/auth_controllers.dart';
-import 'widgets/auth_widgets.dart';
+import '../../../core/widgets/form_message.dart';
 
 Future<void> showForgotPasswordSheet(
   BuildContext context, {

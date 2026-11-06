@@ -12,6 +12,42 @@ enum PasswordStrength {
   final int bars;
 }
 
+/// What a new password must contain. Shown as a live checklist on Create
+/// account, so people see what is missing while they type instead of being
+/// stopped at the end. Keep in step with the password policy in the Firebase
+/// console (Authentication > Settings > Password policy).
+enum PasswordRequirement {
+  length(
+    'At least ${AppConfig.minPasswordLength} characters',
+    'more characters',
+  ),
+  uppercase('An uppercase letter (A-Z)', 'an uppercase letter'),
+  lowercase('A lowercase letter (a-z)', 'a lowercase letter'),
+  number('A number (0-9)', 'a number'),
+  symbol('A symbol, such as ! # or @', 'a symbol');
+
+  const PasswordRequirement(this.label, this.missing);
+
+  /// The checklist line.
+  final String label;
+
+  /// How the error message names it when it is missing.
+  final String missing;
+
+  bool isMetBy(String password) => switch (this) {
+    length => password.length >= AppConfig.minPasswordLength,
+    uppercase => RegExp('[A-Z]').hasMatch(password),
+    lowercase => RegExp('[a-z]').hasMatch(password),
+    number => RegExp(r'\d').hasMatch(password),
+    symbol => RegExp('[^A-Za-z0-9]').hasMatch(password),
+  };
+
+  static List<PasswordRequirement> missingFrom(String password) => [
+    for (final r in values)
+      if (!r.isMetBy(password)) r,
+  ];
+}
+
 /// Form validators. Each returns an error message, or null when the value is
 /// valid, so they plug straight into `FormField.validator`.
 class Validators {
@@ -47,10 +83,13 @@ class Validators {
 
   static String? password(String? value) {
     if (value == null || value.isEmpty) return 'Password is required';
-    if (value.length < AppConfig.minPasswordLength) {
-      return 'Use at least ${AppConfig.minPasswordLength} characters';
-    }
-    return null;
+    final missing = [
+      for (final r in PasswordRequirement.missingFrom(value)) r.missing,
+    ];
+    if (missing.isEmpty) return null;
+    if (missing.length == 1) return 'Add ${missing.single}';
+    final last = missing.removeLast();
+    return 'Add ${missing.join(', ')} and $last';
   }
 
   static String? confirmPassword(String? value, String password) {
