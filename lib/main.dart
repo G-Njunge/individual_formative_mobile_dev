@@ -10,9 +10,20 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final FirebaseOptions options;
+  try {
+    options = DefaultFirebaseOptions.currentPlatform;
+  } on UnsupportedError catch (e) {
+    // Running on a platform `flutterfire configure` didn't set up (e.g.
+    // Chrome). Say so on screen instead of leaving a blank page.
+    runApp(_StartupProblem(message: '${e.message}'));
+    return;
+  }
+
   final (prefs, _) = await (
     SharedPreferences.getInstance(),
-    Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform),
+    Firebase.initializeApp(options: options),
   ).wait;
   runApp(
     ProviderScope(
@@ -20,4 +31,32 @@ Future<void> main() async {
       child: const RipotiApp(),
     ),
   );
+}
+
+class _StartupProblem extends StatelessWidget {
+  const _StartupProblem({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: const Color(0xFF2B2230),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              "Ripoti isn't set up for this platform yet.\n\n$message\n\n"
+              'Run it on Android (an emulator or a phone), or see the '
+              'README to add this platform.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Color(0xFFF3ECF1), fontSize: 15),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

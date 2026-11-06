@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -56,7 +53,6 @@ class DefaultFirebaseOptions {
     projectId: 'formative2-b25e3',
     storageBucket: 'formative2-b25e3.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDjjHVZmTeyXCaGUmi5Y-BItoZbIE-hQpA',
     appId: '1:864949392985:ios:415d091133a2736efc8348',
@@ -64,5 +60,13 @@ class DefaultFirebaseOptions {
     projectId: 'formative2-b25e3',
     storageBucket: 'formative2-b25e3.firebasestorage.app',
     iosBundleId: 'com.ripoti.app',
+  );
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDNFHDft_X-a63lHLQSySZDUw-OR8Z0iDM',
+    appId: '1:864949392985:web:28c7b362c6d76f80fc8348',
+    messagingSenderId: '864949392985',
+    projectId: 'formative2-b25e3',
+    authDomain: 'formative2-b25e3.firebaseapp.com',
+    storageBucket: 'formative2-b25e3.firebasestorage.app',
   );
 }
