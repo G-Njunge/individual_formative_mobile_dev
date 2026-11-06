@@ -33,6 +33,10 @@ class Routes {
   static const staffReports = '/staff/reports';
   static const staffProfile = '/staff/profile';
 
+  /// "Review and update" sits above the staff tabs (no nav bar).
+  static const staffReviewPattern = '/staff/report/:id';
+  static String staffReview(String id) => '/staff/report/$id';
+
   // Debug builds only.
   static const gallery = '/debug/gallery';
 

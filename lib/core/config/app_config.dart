@@ -15,6 +15,9 @@ class AppConfig {
   static const maxDescriptionLength = 300;
   static const minPasswordLength = 8;
 
+  /// Longest note staff can leave on a status update.
+  static const maxNoteLength = 500;
+
   /// Photos are stored in Firestore (no Storage on the free plan), so they are
   /// compressed hard before upload to keep every document well under 1 MiB.
   static const photoMaxWidth = 1024.0;

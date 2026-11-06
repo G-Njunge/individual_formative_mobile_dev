@@ -13,6 +13,9 @@ import '../../features/reports/presentation/home_screen.dart';
 import '../../features/reports/presentation/new_report_screen.dart';
 import '../../features/reports/presentation/report_details_screen.dart';
 import '../../features/reports/presentation/report_submitted_screen.dart';
+import '../../features/staff/presentation/review_update_screen.dart';
+import '../../features/staff/presentation/staff_dashboard_screen.dart';
+import '../../features/staff/presentation/staff_reports_screen.dart';
 import '../debug/component_gallery_screen.dart';
 import '../debug/placeholder_screen.dart';
 import 'routes.dart';
@@ -126,10 +129,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.staffDashboard,
-                builder: (_, _) => const PlaceholderScreen(
-                  title: 'Facilities desk',
-                  milestone: 4,
-                ),
+                builder: (_, _) => const StaffDashboardScreen(),
               ),
             ],
           ),
@@ -137,8 +137,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.staffReports,
-                builder: (_, _) =>
-                    const PlaceholderScreen(title: 'All reports', milestone: 4),
+                builder: (_, _) => const StaffReportsScreen(),
               ),
             ],
           ),
@@ -155,6 +154,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+
+      // Full-screen page above the staff tabs.
+      GoRoute(
+        path: Routes.staffReviewPattern,
+        builder: (_, state) =>
+            ReviewUpdateScreen(reportId: state.pathParameters['id']!),
       ),
 
       if (kDebugMode)
