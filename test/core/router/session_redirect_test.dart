@@ -69,6 +69,8 @@ void main() {
       expect(go(SessionStatus.student, Routes.reports), isNull);
       expect(go(SessionStatus.student, Routes.newReport), isNull);
       expect(go(SessionStatus.student, Routes.profile), isNull);
+      expect(go(SessionStatus.student, Routes.reportDetails('r1')), isNull);
+      expect(go(SessionStatus.student, Routes.reportSubmitted('r1')), isNull);
     });
 
     test('cannot open staff pages', () {
@@ -82,6 +84,10 @@ void main() {
       expect(go(SessionStatus.staff, Routes.signIn), Routes.staffDashboard);
       expect(go(SessionStatus.staff, Routes.staffReports), isNull);
       expect(go(SessionStatus.staff, Routes.home), Routes.staffDashboard);
+      expect(
+        go(SessionStatus.staff, Routes.reportSubmitted('r1')),
+        Routes.staffDashboard,
+      );
     });
   });
 
