@@ -2,10 +2,9 @@ rules_version = '2';
 
 // Ripoti security rules.
 //
-// Milestone 4: accounts, students creating and reading reports, and staff
-// updating them. Every collection not listed here is denied. Me too,
-// confirm or reopen and announcements are added in Milestone 5, and the
-// full rule set is finished in Milestone 6.
+// Accounts, reports, photos, staff updates, the timeline, notifications,
+// Me too, confirm or reopen and announcements. Every collection not listed
+// here is denied. Reviewed as a whole in Milestone 6.
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -108,6 +107,45 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time
         && !exists(/databases/$(database)/documents/reports/$(reportId))
         && getAfter(/databases/$(database)/documents/reports/$(reportId)).data.anonymous == true;
+      // Only "when did I last read its updates", for notifications.
+      allow update: if isSelf(uid) && verified()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['seenAt'])
+        && request.resource.data.seenAt == request.time;
+    }
+
+    // ---------- users/{uid}/following/{reportId} ----------
+    //
+    // Private list of the reports a student backs ("Followed reports").
+    // Written and removed only together with the supporter record.
+    match /users/{uid}/following/{reportId} {
+      allow read: if isSelf(uid) && verified();
+      allow create: if isSelf(uid) && verified()
+        && request.resource.data.keys().hasOnly(['createdAt'])
+        && request.resource.data.createdAt == request.time
+        && existsAfter(supporterPath(reportId, uid));
+      allow delete: if isSelf(uid)
+        && !existsAfter(supporterPath(reportId, uid));
+    }
+
+    function supporterPath(reportId, uid) {
+      return /databases/$(database)/documents/reports/$(reportId)/supporters/$(uid);
+    }
+
+    // ---------- announcements/{id} ----------
+
+    match /announcements/{announcementId} {
+      allow read: if verified();
+      allow create: if isStaff()
+        && request.resource.data.keys().hasOnly(['title', 'body', 'byName', 'createdAt'])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 5
+        && request.resource.data.title.size() <= 80
+        && request.resource.data.body is string
+        && request.resource.data.body.size() <= 300
+        && request.resource.data.byName is string
+        && request.resource.data.createdAt == request.time;
+      allow delete: if isStaff();
     }
 
     // ---------- users/{uid}/notifications/{id} ----------
@@ -226,7 +264,10 @@ service cloud.firestore {
       // duplicate link, nothing else (the reporter's words, ticket number
       // and backers stay as they are). Me too and confirm or reopen add
       // student rules in Milestone 5. Reports are never deleted from the app.
-      allow update: if isStaff() && isValidStaffChange(reportId);
+      allow update: if (isStaff() && isValidStaffChange(reportId))
+        || isMeTooChange(reportId)
+        || isConfirmByReporter(reportId)
+        || isReopenByReporter(reportId);
 
       // Photos are written in the same transaction as the report, by its
       // reporter, one per document ('0', '1', '2'), never more than the
@@ -267,10 +308,69 @@ service cloud.firestore {
                     && d.duplicateOf.ticketNumber is int));
       }
 
-      // Supporters ("Me too"). Staff read them to notify every backer. The
-      // Me too button writes them from Milestone 5.
+      // The reporter of this report: named (their id is on it) or
+      // anonymous (they hold the private link).
+      function isReporter(reportId) {
+        return signedIn()
+          && (resource.data.reporterId == request.auth.uid
+              || exists(ownerRecord(request.auth.uid, reportId)));
+      }
+
+      // "Me too": the count moves by exactly one, in the same write that
+      // adds or removes this student's supporter record. Nothing else on
+      // the report may change.
+      function isMeTooChange(reportId) {
+        let d = request.resource.data;
+        let me = supporterPath(reportId, request.auth.uid);
+        return verified()
+          && d.diff(resource.data).affectedKeys().hasOnly(['meTooCount'])
+          && ((d.meTooCount == resource.data.meTooCount + 1
+                && !exists(me) && existsAfter(me))
+              || (d.meTooCount == resource.data.meTooCount - 1
+                && exists(me) && !existsAfter(me)));
+      }
+
+      // "Yes, fixed": only the reporter, only on a resolved report.
+      function isConfirmByReporter(reportId) {
+        return verified() && isReporter(reportId)
+          && resource.data.status == 'resolved'
+          && resource.data.get('confirmed', false) == false
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['confirmed'])
+          && request.resource.data.confirmed == true;
+      }
+
+      // "Reopen": only the reporter, only a resolved report they haven't
+      // confirmed, back to submitted.
+      function isReopenByReporter(reportId) {
+        return verified() && isReporter(reportId)
+          && resource.data.status == 'resolved'
+          && resource.data.get('confirmed', false) == false
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['status', 'updatedAt'])
+          && request.resource.data.status == 'submitted'
+          && request.resource.data.updatedAt == request.time;
+      }
+
+      // Supporters ("Me too"), one per student. Staff read them to notify
+      // every backer; a student can only see their own, so who backed a
+      // report isn't public. Students can't back their own report, and
+      // nobody can back a resolved one. The count and the private
+      // "following" record change in the same write.
       match /supporters/{supporterId} {
-        allow read: if verified();
+        allow read: if isStaff() || (isSelf(supporterId) && verified());
+        allow create: if isSelf(supporterId) && isStudent()
+          && request.resource.data.keys().hasOnly(['createdAt'])
+          && request.resource.data.createdAt == request.time
+          && get(/databases/$(database)/documents/reports/$(reportId)).data.status != 'resolved'
+          && get(/databases/$(database)/documents/reports/$(reportId)).data.reporterId != request.auth.uid
+          && !exists(ownerRecord(request.auth.uid, reportId))
+          && getAfter(/databases/$(database)/documents/reports/$(reportId)).data.meTooCount
+               == get(/databases/$(database)/documents/reports/$(reportId)).data.meTooCount + 1
+          && existsAfter(/databases/$(database)/documents/users/$(request.auth.uid)/following/$(reportId));
+        allow delete: if isSelf(supporterId) && verified()
+          && getAfter(/databases/$(database)/documents/reports/$(reportId)).data.meTooCount
+               == get(/databases/$(database)/documents/reports/$(reportId)).data.meTooCount - 1;
       }
 
       // The report it belongs to is checked in full in the same write, so a
@@ -302,7 +402,31 @@ service cloud.firestore {
                     && request.resource.data.note.size() <= 500))
           && request.resource.data.byUid == request.auth.uid
           && request.resource.data.byName is string
-          && request.resource.data.createdAt == request.time;
+          && request.resource.data.createdAt == request.time
+        // The reporter's "Reopen" entry, in the same write as the reopen.
+        // It names "Reporter" and carries no user id, so reopening an
+        // anonymous report doesn't reveal who sent it.
+        || (verified()
+          && isReporterOf(reportId)
+          && request.resource.data.keys().hasOnly([
+               'status', 'previousStatus', 'note', 'byUid', 'byName',
+               'createdAt'])
+          && request.resource.data.status == 'submitted'
+          && request.resource.data.previousStatus == 'resolved'
+          && request.resource.data.note is string
+          && request.resource.data.note.size() >= 5
+          && request.resource.data.note.size() <= 320
+          && request.resource.data.byUid == ''
+          && request.resource.data.byName == 'Reporter'
+          && request.resource.data.createdAt == request.time
+          && get(/databases/$(database)/documents/reports/$(reportId)).data.status == 'resolved'
+          && getAfter(/databases/$(database)/documents/reports/$(reportId)).data.status == 'submitted');
+      }
+
+      // Same as isReporter, for rules on documents inside the report.
+      function isReporterOf(reportId) {
+        return get(/databases/$(database)/documents/reports/$(reportId)).data.reporterId == request.auth.uid
+          || exists(ownerRecord(request.auth.uid, reportId));
       }
     }
   }
