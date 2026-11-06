@@ -516,8 +516,8 @@ class _ComponentGalleryScreenState
   );
 }
 
-/// The 3-column category grid from New report, here as a preview. It moves
-/// into the reports feature in Milestone 3.
+/// The 3-column category grid from New report, here as a preview (the real
+/// one is in the reports feature).
 class _CategoryGrid extends StatelessWidget {
   const _CategoryGrid({required this.selected, required this.onSelected});
 

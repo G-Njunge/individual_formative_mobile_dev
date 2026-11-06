@@ -51,11 +51,13 @@ class PasswordChecklist extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        rule.label,
-                        style: AppText.meta.copyWith(
-                          color: met ? c.teal : c.textSecondary,
-                          fontWeight: met ? FontWeight.w700 : null,
+                      Expanded(
+                        child: Text(
+                          rule.label,
+                          style: AppText.meta.copyWith(
+                            color: met ? c.teal : c.textSecondary,
+                            fontWeight: met ? FontWeight.w700 : null,
+                          ),
                         ),
                       ),
                     ],
