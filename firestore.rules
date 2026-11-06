@@ -1,0 +1,82 @@
+rules_version = '2';
+
+// Ripoti security rules.
+//
+// Milestone 2: accounts only. Every collection not listed here is denied.
+// Reports, updates, notifications and announcements are added in later
+// milestones, and the full rule set is finished in Milestone 6.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Helpers ----------
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Has clicked the link in the verification email.
+    function verified() {
+      return signedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // Campus email domains. Keep in step with AppConfig in the app.
+    function isStudentEmail(email) {
+      return email.matches('.*@alustudent[.]com');
+    }
+
+    function isStaffEmail(email) {
+      return email.matches('.*@alueducation[.]com');
+    }
+
+    // A profile someone creates for themselves at sign up.
+    // - email must be the one they signed in with
+    // - role must match the email domain
+    // - staff always start unapproved; nobody can approve themselves
+    // - createdAt must be the server's time
+    function isValidNewProfile() {
+      let d = request.resource.data;
+      let common = d.name is string
+        && d.name.size() >= 2 && d.name.size() <= 80
+        && d.email == request.auth.token.email.lower()
+        && d.createdAt == request.time;
+      let student = d.role == 'student'
+        && isStudentEmail(d.email)
+        && d.keys().hasOnly(['name', 'email', 'role', 'createdAt']);
+      let staff = d.role == 'staff'
+        && isStaffEmail(d.email)
+        && d.staffId is string && d.staffId.size() <= 20
+        && d.approved == false
+        && d.keys().hasOnly(['name', 'email', 'role', 'staffId', 'approved', 'createdAt']);
+      return common && (student || staff);
+    }
+
+    // ---------- users/{uid} ----------
+
+    match /users/{uid} {
+      // Your own profile, or any staff profile (needed to show who a report
+      // is assigned to and to pick an assignee). Student profiles stay private.
+      allow read: if isSelf(uid)
+        || (verified() && resource.data.role == 'staff');
+
+      allow create: if isSelf(uid) && isValidNewProfile();
+
+      // People may only change their name. role, email, staffId, team and
+      // approved are set at sign up or by an admin in the console.
+      allow update: if isSelf(uid)
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['name'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2;
+
+      // Only unverified accounts delete themselves ("Use a different email"
+      // or the 24-hour clean-up).
+      allow delete: if isSelf(uid)
+        && request.auth.token.email_verified == false;
+    }
+  }
+}
