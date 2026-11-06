@@ -142,6 +142,34 @@ class _ReportBody extends ConsumerWidget {
             style: AppText.meta.copyWith(color: c.textSecondary),
           ),
         ],
+        if (report.duplicateOf case final dup?) ...[
+          const SizedBox(height: 14),
+          NeuCard(
+            onTap: () => context.push(Routes.reportDetails(dup.id)),
+            semanticLabel:
+                'Closed as a duplicate of ticket ${dup.ticketNumber}. Open it',
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Closed as a duplicate of #${dup.ticketNumber}. Follow '
+                    'that ticket for updates.',
+                    style: AppText.body.copyWith(
+                      fontSize: 14,
+                      color: c.textBody,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                AppIconView(AppIcon.chevronRight, color: c.amberLight),
+              ],
+            ),
+          ),
+        ],
+        if (report.hasAfterPhoto) ...[
+          const SizedBox(height: AppSpacing.section),
+          _AfterPhoto(reportId: report.id),
+        ],
         const SizedBox(height: AppSpacing.section),
         _BackersCard(count: report.meTooCount),
         const SizedBox(height: AppSpacing.section),
@@ -194,6 +222,50 @@ class _ReportBody extends ConsumerWidget {
       },
       titleColor: e.status.color(c),
       note: e.note,
+    );
+  }
+}
+
+/// The photo staff took of the fix.
+class _AfterPhoto extends ConsumerWidget {
+  const _AfterPhoto({required this.reportId});
+
+  final String reportId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final photo = ref.watch(reportAfterPhotoProvider(reportId));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Semantics(
+          header: true,
+          child: Text(
+            'After the fix',
+            style: AppText.sectionHeading.copyWith(fontSize: 17),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.listGap),
+        AsyncValueView(
+          value: photo,
+          onRetry: () => ref.invalidate(reportAfterPhotoProvider(reportId)),
+          loading: const LoadingState(itemCount: 1, itemHeight: 200),
+          data: (bytes) => bytes == null
+              ? const SizedBox.shrink()
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(AppRadii.card),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 10,
+                    child: Image.memory(
+                      bytes,
+                      fit: BoxFit.cover,
+                      gaplessPlayback: true,
+                      semanticLabel: 'Photo of the fix',
+                    ),
+                  ),
+                ),
+        ),
+      ],
     );
   }
 }

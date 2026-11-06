@@ -23,6 +23,24 @@ class Assignee {
   };
 }
 
+/// Set when staff close a report as a duplicate of an earlier one.
+class DuplicateLink {
+  const DuplicateLink({required this.id, required this.ticketNumber});
+
+  final String id;
+  final int ticketNumber;
+
+  static DuplicateLink? fromJson(Object? json) => switch (json) {
+    {'id': final String id, 'ticketNumber': final num n} => DuplicateLink(
+      id: id,
+      ticketNumber: n.toInt(),
+    ),
+    _ => null,
+  };
+
+  Map<String, dynamic> toJson() => {'id': id, 'ticketNumber': ticketNumber};
+}
+
 /// A report stored at `reports/{id}`.
 ///
 /// Photos are not part of this document. They live in
@@ -43,6 +61,8 @@ class Report {
     this.photoCount = 0,
     this.assignedTo,
     this.meTooCount = 0,
+    this.hasAfterPhoto = false,
+    this.duplicateOf,
     this.createdAt,
     this.updatedAt,
   });
@@ -69,6 +89,12 @@ class Report {
 
   final Assignee? assignedTo;
   final int meTooCount;
+
+  /// Staff attached a photo of the fix (`reports/{id}/photos/after`).
+  final bool hasAfterPhoto;
+
+  /// The earlier report this one repeats, if staff closed it as a duplicate.
+  final DuplicateLink? duplicateOf;
 
   /// Null for a moment after creation, until the server timestamp arrives.
   final DateTime? createdAt;
@@ -99,6 +125,8 @@ class Report {
           ? Assignee.fromJson(assigned)
           : null,
       meTooCount: (json['meTooCount'] as num?)?.toInt() ?? 0,
+      hasAfterPhoto: (json['hasAfterPhoto'] as bool?) ?? false,
+      duplicateOf: DuplicateLink.fromJson(json['duplicateOf']),
       createdAt: (json['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (json['updatedAt'] as Timestamp?)?.toDate(),
     );
@@ -120,6 +148,10 @@ class Report {
     'photoCount': photoCount,
     'assignedTo': assignedTo?.toJson(),
     'meTooCount': meTooCount,
+    // Only staff set these, so a new report never carries them (the rules
+    // list exactly which fields a new report may have).
+    if (hasAfterPhoto) 'hasAfterPhoto': true,
+    if (duplicateOf != null) 'duplicateOf': duplicateOf!.toJson(),
   };
 }
 
@@ -129,6 +161,7 @@ class ReportUpdate {
   const ReportUpdate({
     required this.id,
     required this.status,
+    this.previousStatus,
     this.note,
     required this.byUid,
     required this.byName,
@@ -138,17 +171,28 @@ class ReportUpdate {
 
   final String id;
   final ReportStatus status;
+
+  /// The status before this update. Equal to [status] when staff only left
+  /// a note. Lets the reporter's app tell "is now In progress" from "left a
+  /// note" when it builds notifications for anonymous reports.
+  final ReportStatus? previousStatus;
   final String? note;
   final String byUid;
   final String byName;
   final String? byTeam;
   final DateTime? createdAt;
 
+  bool get changedStatus => previousStatus != null && previousStatus != status;
+
   factory ReportUpdate.fromJson(String id, Map<String, dynamic> json) {
     final note = (json['note'] as String?)?.trim();
     return ReportUpdate(
       id: id,
       status: ReportStatus.fromValue(json['status'] as String?),
+      previousStatus: switch (json['previousStatus']) {
+        final String v => ReportStatus.fromValue(v),
+        _ => null,
+      },
       note: note == null || note.isEmpty ? null : note,
       byUid: (json['byUid'] as String?) ?? '',
       byName: (json['byName'] as String?) ?? '',
@@ -159,6 +203,7 @@ class ReportUpdate {
 
   Map<String, dynamic> toJson() => {
     'status': status.value,
+    if (previousStatus != null) 'previousStatus': previousStatus!.value,
     'note': note,
     'byUid': byUid,
     'byName': byName,

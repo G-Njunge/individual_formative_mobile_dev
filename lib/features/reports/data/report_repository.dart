@@ -103,6 +103,19 @@ class ReportRepository {
     ];
   }
 
+  /// The photo staff attached when they resolved the report, or null.
+  Future<Uint8List?> fetchAfterPhoto(String reportId) async {
+    final doc = await _reports
+        .doc(reportId)
+        .collection('photos')
+        .doc('after')
+        .get();
+    return switch (doc.data()?['data']) {
+      final Blob blob => blob.bytes,
+      _ => null,
+    };
+  }
+
   /// Creates a report and returns its id.
   ///
   /// Everything happens in one transaction: the ticket counter goes up by

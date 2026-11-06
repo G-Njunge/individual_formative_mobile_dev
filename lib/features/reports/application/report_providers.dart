@@ -99,6 +99,11 @@ final reportPhotosProvider = FutureProvider.autoDispose
       (ref, id) => ref.watch(reportRepositoryProvider).fetchPhotos(id),
     );
 
+final reportAfterPhotoProvider = FutureProvider.autoDispose
+    .family<Uint8List?, String>(
+      (ref, id) => ref.watch(reportRepositoryProvider).fetchAfterPhoto(id),
+    );
+
 /// The progress timeline for one report, rebuilt whenever the report or
 /// its updates change.
 final reportTimelineProvider = Provider.autoDispose

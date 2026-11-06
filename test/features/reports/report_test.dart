@@ -68,6 +68,34 @@ void main() {
       expect(json['category'], 'furniture');
       expect(json['status'], 'submitted');
     });
+
+    test('reads what staff add, and a new report never carries it', () {
+      final r = Report.fromJson('r1', {
+        'hasAfterPhoto': true,
+        'duplicateOf': {'id': 'r0', 'ticketNumber': 1040},
+      });
+      expect(r.hasAfterPhoto, isTrue);
+      expect(r.duplicateOf?.ticketNumber, 1040);
+
+      final fresh = Report.fromJson('r2', {}).toJson();
+      expect(fresh.containsKey('hasAfterPhoto'), isFalse);
+      expect(fresh.containsKey('duplicateOf'), isFalse);
+    });
+  });
+
+  test('ReportUpdate knows a status change from a note', () {
+    final moved = ReportUpdate.fromJson('a', {
+      'status': 'in_progress',
+      'previousStatus': 'submitted',
+    });
+    final noteOnly = ReportUpdate.fromJson('b', {
+      'status': 'in_progress',
+      'previousStatus': 'in_progress',
+      'note': 'Parts ordered',
+    });
+    expect(moved.changedStatus, isTrue);
+    expect(noteOnly.changedStatus, isFalse);
+    expect(moved.toJson()['previousStatus'], 'submitted');
   });
 
   test('ReportUpdate treats a blank note as no note', () {
