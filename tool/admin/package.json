@@ -1,0 +1,13 @@
+{
+  "name": "ripoti-admin",
+  "private": true,
+  "description": "Admin scripts for Ripoti (run from your machine with a service-account key).",
+  "scripts": {
+    "cleanup": "node cleanup-unverified.js",
+    "cleanup:dry": "node cleanup-unverified.js --dry-run",
+    "approve": "node approve-staff.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
+  }
+}
