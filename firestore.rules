@@ -2,9 +2,9 @@ rules_version = '2';
 
 // Ripoti security rules.
 //
-// Milestone 3: accounts, and students creating and reading reports.
-// Every collection not listed here is denied. Staff updates, Me too,
-// notifications and announcements are added in Milestones 4 and 5, and the
+// Milestone 4: accounts, students creating and reading reports, and staff
+// updating them. Every collection not listed here is denied. Me too,
+// confirm or reopen and announcements are added in Milestone 5, and the
 // full rule set is finished in Milestone 6.
 
 service cloud.firestore {
@@ -32,6 +32,19 @@ service cloud.firestore {
 
     function isStaffEmail(email) {
       return email.matches('.*@alueducation[.]com');
+    }
+
+    // Approved staff. `npm run approve` puts a `staff` flag on the login
+    // token (a custom claim only the Admin SDK can set). Reading the token
+    // costs no document lookup, which matters because one status update
+    // writes a notification per supporter and Firestore allows only 20
+    // lookups per write.
+    function isStaff() {
+      return verified() && request.auth.token.staff == true;
+    }
+
+    function isStatus(value) {
+      return value in ['submitted', 'under_review', 'in_progress', 'resolved'];
     }
 
     // A profile someone creates for themselves at sign up.
@@ -95,6 +108,32 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time
         && !exists(/databases/$(database)/documents/reports/$(reportId))
         && getAfter(/databases/$(database)/documents/reports/$(reportId)).data.anonymous == true;
+    }
+
+    // ---------- users/{uid}/notifications/{id} ----------
+    //
+    // Written by staff when they update a report the person sent (named) or
+    // backed. The owner can read them, mark them read and delete them.
+    match /users/{uid}/notifications/{notificationId} {
+      allow read, delete: if isSelf(uid) && verified();
+      allow create: if isStaff()
+        && request.resource.data.keys().hasOnly([
+             'type', 'reportId', 'ticketNumber', 'reportTitle', 'status',
+             'note', 'read', 'createdAt'])
+        && request.resource.data.type in ['status', 'note']
+        && request.resource.data.reportId is string
+        && request.resource.data.ticketNumber is int
+        && request.resource.data.reportTitle is string
+        && isStatus(request.resource.data.status)
+        && (request.resource.data.note == null
+              || (request.resource.data.note is string
+                  && request.resource.data.note.size() <= 500))
+        && request.resource.data.read == false
+        && request.resource.data.createdAt == request.time;
+      allow update: if isSelf(uid) && verified()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['read'])
+        && request.resource.data.read == true;
     }
 
     // ---------- Reports ----------
@@ -182,8 +221,12 @@ service cloud.firestore {
       // Any verified user can browse every report.
       allow read: if verified();
       allow create: if isValidNewReport(reportId);
-      // Staff status updates (Milestone 4) and Me too (Milestone 5) add
-      // update rules here. Reports are never deleted from the app.
+
+      // Staff change the status, the assignee, the after-photo flag and the
+      // duplicate link, nothing else (the reporter's words, ticket number
+      // and backers stay as they are). Me too and confirm or reopen add
+      // student rules in Milestone 5. Reports are never deleted from the app.
+      allow update: if isStaff() && isValidStaffChange(reportId);
 
       // Photos are written in the same transaction as the report, by its
       // reporter, one per document ('0', '1', '2'), never more than the
@@ -191,7 +234,43 @@ service cloud.firestore {
       // 1 MiB). They can't be changed afterwards.
       match /photos/{photoId} {
         allow read: if verified();
-        allow create: if verified() && isValidNewPhoto(reportId, photoId);
+        allow create: if isValidAfterPhoto(photoId)
+          || (verified() && isValidNewPhoto(reportId, photoId));
+        // Staff may replace the after photo.
+        allow update: if isValidAfterPhoto(photoId);
+      }
+
+      // The photo of the fix, added by staff when they resolve a report.
+      function isValidAfterPhoto(photoId) {
+        return isStaff()
+          && photoId == 'after'
+          && request.resource.data.keys().hasOnly(['data'])
+          && request.resource.data.data is bytes
+          && request.resource.data.data.size() <= 800000;
+      }
+
+      function isValidStaffChange(reportId) {
+        let d = request.resource.data;
+        return d.diff(resource.data).affectedKeys().hasOnly([
+            'status', 'assignedTo', 'updatedAt', 'hasAfterPhoto', 'duplicateOf'])
+          && isStatus(d.status)
+          && d.updatedAt == request.time
+          && (d.assignedTo == null
+                || (d.assignedTo.keys().hasOnly(['uid', 'name', 'team'])
+                    && d.assignedTo.uid is string
+                    && d.assignedTo.name is string))
+          && (!('hasAfterPhoto' in d) || d.hasAfterPhoto is bool)
+          && (!('duplicateOf' in d)
+                || (d.duplicateOf.keys().hasOnly(['id', 'ticketNumber'])
+                    && d.duplicateOf.id is string
+                    && d.duplicateOf.id != reportId
+                    && d.duplicateOf.ticketNumber is int));
+      }
+
+      // Supporters ("Me too"). Staff read them to notify every backer. The
+      // Me too button writes them from Milestone 5.
+      match /supporters/{supporterId} {
+        allow read: if verified();
       }
 
       // The report it belongs to is checked in full in the same write, so a
@@ -208,9 +287,22 @@ service cloud.firestore {
           && request.resource.data.data.size() <= 800000;
       }
 
-      // The progress timeline. Staff write it from Milestone 4.
+      // The progress timeline. One entry per staff update, never changed.
       match /updates/{updateId} {
         allow read: if verified();
+        allow create: if isStaff()
+          && request.resource.data.keys().hasOnly([
+               'status', 'previousStatus', 'note', 'byUid', 'byName', 'byTeam',
+               'createdAt'])
+          && isStatus(request.resource.data.status)
+          && (!('previousStatus' in request.resource.data)
+                || isStatus(request.resource.data.previousStatus))
+          && (request.resource.data.note == null
+                || (request.resource.data.note is string
+                    && request.resource.data.note.size() <= 500))
+          && request.resource.data.byUid == request.auth.uid
+          && request.resource.data.byName is string
+          && request.resource.data.createdAt == request.time;
       }
     }
   }
