@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "864949392985",
+    "project_id": "formative2-b25e3",
+    "storage_bucket": "formative2-b25e3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864949392985:android:12178a0097a8aa4cfc8348",
+        "android_client_info": {
+          "package_name": "com.ripoti.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkvY14tPEA7Zgi2NkXiOr-zpFGhp-llGE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
