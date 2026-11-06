@@ -5,7 +5,8 @@
   "scripts": {
     "cleanup": "node cleanup-unverified.js",
     "cleanup:dry": "node cleanup-unverified.js --dry-run",
-    "approve": "node approve-staff.js"
+    "approve": "node approve-staff.js",
+    "verify": "node verify-email.js"
   },
   "dependencies": {
     "firebase-admin": "^13.0.0"
