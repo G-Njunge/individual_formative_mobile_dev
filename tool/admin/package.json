@@ -6,7 +6,10 @@
     "cleanup": "node cleanup-unverified.js",
     "cleanup:dry": "node cleanup-unverified.js --dry-run",
     "approve": "node approve-staff.js",
-    "verify": "node verify-email.js"
+    "verify": "node verify-email.js",
+    "seed": "node seed.js",
+    "seed:clear": "node seed.js --clear",
+    "test:rules": "node rules-test/run.js"
   },
   "dependencies": {
     "firebase-admin": "^13.0.0"
