@@ -12,10 +12,10 @@ Built with Flutter, Riverpod and Firebase (Authentication and Cloud Firestore), 
 | 2 | Firebase set-up, sign in and sign up, email verification, forgot password, onboarding, role-based routing | Done (needs `flutterfire configure`, see below) |
 | 3 | Student reporting: New report with photos, Report submitted, Home, Browse, Report details | Done (redeploy rules and indexes, see below) |
 | 4 | Staff dashboard, All reports, Review and update (status, assignee, note, after photo, duplicate), notification fan-out | Done (redeploy rules, re-run `npm run approve` for existing staff) |
-| 5 | Me too, notifications, profile, confirm or reopen | Not started |
+| 5 | Me too, Notifications, Profile (student and staff), confirm or reopen, announcements, notification settings, Help and FAQ | Done (redeploy rules) |
 | 6 | Full security rules, indexes, seed data, remaining tests, final README | Not started |
 
-Screens that belong to Milestone 5 (Notifications and both Profile tabs) are temporary placeholders, so routing and sign-in can already be tried end to end.
+Every screen in the design is built. Milestone 6 reviews the rules and indexes as a whole and adds seed data.
 
 ## Setup
 
@@ -126,12 +126,14 @@ lib/
     models/                   report status, urgency and category enums
     utils/                    validators, time formatting
     errors/ storage/ firebase/  small shared providers and types
-    debug/                    component gallery and placeholders (debug only)
+    debug/                    component gallery (debug only)
   features/
     auth/          data/ (AppUser, AuthRepository)  application/ (providers, controllers)  presentation/ (screens)
     onboarding/    application/ (seen flag)  presentation/ (carousel)
     reports/       data/ (Report, ReportRepository, PhotoPicker)  application/ (providers, filters, New report controller)  presentation/ (Home, Browse, New report, Submitted, Details)
     staff/         data/ (StaffRepository, StaffUpdateDraft)  application/ (queue and stats, save controller)  presentation/ (Dashboard, All reports, Review and update)
+    notifications/ data/ (AppNotification, Announcement, NotificationRepository)  application/ (feed, settings, mark read)  presentation/ (Notifications)
+    profile/       presentation/ (student and staff Profile, Followed reports, Notification settings, Help and FAQ)
 ```
 
 - **data/**: repositories are the only code that talks to Firebase. They return app models and throw readable errors (`UserFacingException`) instead of Firebase error codes.
@@ -183,7 +185,7 @@ Any signed-in user can read any report, so whatever a report stores is effective
 
 What this doesn't hide: the Firebase project owner can still see the private records in the console, which is normal for campus systems (abuse can be followed up).
 
-Staff can't notify an anonymous reporter directly, because they don't know who it is. Instead the reporter's own app, which already follows their anonymous reports through the private records, turns each new timeline entry into a notification (Milestone 5). Each timeline entry stores `previousStatus` so the app can tell "is now In progress" from "left a note". Like every notification in the app, these show inside the app; push messages would need Cloud Functions.
+Staff can't notify an anonymous reporter directly, because they don't know who it is. Instead the reporter's own app, which already follows their anonymous reports through the private records, turns each new timeline entry into a notification. Each timeline entry stores `previousStatus` so the app can tell "is now In progress" from "left a note". Like every notification in the app, these show inside the app; push messages would need Cloud Functions.
 
 ### Staff updates and notifications
 
@@ -210,6 +212,36 @@ Notifications store facts (type, ticket, status, note), not sentences, so the No
 
 New and Mine put the most urgent first, then the most backed, then the oldest, so what has waited longest isn't buried. "Resolved this week" uses the time of each report's last update.
 
+### Me too
+
+"Me too" writes three things in one batch:
+- a supporter record, `reports/{id}/supporters/{uid}`, so each student counts once and staff can notify them;
+- a private "following" record, `users/{uid}/following/{reportId}`, which feeds "Followed reports" on Profile;
+- the count, changed with `FieldValue.increment(1)`, so two students tapping at the same moment both count.
+
+The rules check that the count moves by exactly one, in the same write that adds or removes that student's supporter record. They also stop a student backing their own report (named or anonymous) or a resolved one. Only staff and the student themselves can read a supporter record, so who backed a report isn't public.
+
+After a tap the button is pressed and reads "Added". Tapping it again asks "Remove your support?", explaining that the count goes down and the updates stop, before anything changes.
+
+### Notifications
+
+The Notifications screen joins three sources:
+- **Stored notifications** (`users/{uid}/notifications`), written by staff when they save an update: for the named reporter and every supporter.
+- **Notifications built on the phone** for the student's anonymous reports, from those reports' timelines (see [Anonymous reports](#anonymous-reports)). Their read state is a `seenAt` time on the private link to the report.
+- **The latest campus announcement**, if it is less than 14 days old. Staff post it from their Profile.
+
+Rows are grouped into Today and Earlier. Unread rows are bold with an amber dot, and the nav bar's bell has the same dot. "Mark all read" clears both kinds in one go.
+
+**Notification settings** on Profile has two switches, saved on the phone: "Reports I back" and "Campus announcements". There are no push messages, because they need Cloud Functions and the paid plan, so the switches decide what the list and the dot include. Updates on the student's own reports are always shown.
+
+### Confirm or reopen
+
+When staff resolve a report, its reporter is asked "Is it fixed?". The question appears on Report details and on the newest "Resolved" notification, and only while the report is waiting for an answer.
+- **Yes, fixed** sets `confirmed`. A confirmed report can't be reopened.
+- **Reopen** needs a reason ("What's still wrong?"). It sets the report back to Submitted, so it shows in the staff New queue again, and adds the reason to the timeline. Staff see it at the top of Review and update as "Reopened by the reporter".
+
+The reopen entry is credited to "Reporter" with no user id, so reopening an anonymous report doesn't reveal who sent it. The rules allow only the reporter to do either, only on a resolved report. Only staff can post announcements.
+
 ### Fonts
 
 Plus Jakarta Sans is bundled in `assets/fonts` rather than downloaded at runtime, so it works offline and in tests.
@@ -224,12 +256,13 @@ flutter test
 So far:
 - validators and time formatting;
 - the `AppUser` and `Report` models;
-- `AuthRepository`, `ReportRepository` and `StaffRepository`, with `firebase_auth_mocks` and `fake_cloud_firestore`. The staff tests cover the notification fan-out, anonymous reporters, more than 500 supporters, after photos and duplicates;
+- `AuthRepository`, `ReportRepository`, `StaffRepository` and `NotificationRepository`, with `firebase_auth_mocks` and `fake_cloud_firestore`. The staff tests cover the notification fan-out, anonymous reporters, more than 500 supporters, after photos and duplicates; the report tests cover Me too, confirm and reopen;
+- the notification feed: ordering, settings, "Is it fixed?" and phone-built notifications for anonymous reports;
 - search, filters, sort, the timeline, the staff queue and the stats;
 - every routing rule;
-- widget tests for the shared components, the New report form and Review and update.
+- widget tests for the shared components, the New report form, Review and update, Report details (Me too and taking it back, confirm, reopen) and Notifications.
 
-The security rules were checked against sample requests with Firebase's rules test API (allowed and refused cases for students, staff and notifications), and they compile with `firebase deploy --only firestore:rules --dry-run`. A repeatable rules test suite is planned for Milestone 6.
+The security rules were checked against sample requests with Firebase's rules test API (45 allowed and refused cases: report creation, staff updates, notifications, Me too, confirm, reopen, announcements), and they compile with `firebase deploy --only firestore:rules --dry-run`. A repeatable rules test suite is planned for Milestone 6.
 
 ## Assignment checklist
 
@@ -238,16 +271,16 @@ The security rules were checked against sample requests with Firebase's rules te
 | Submit reports with description, category, optional photos | [new_report_screen.dart](lib/features/reports/presentation/new_report_screen.dart), `ReportRepository.createReport` | Done |
 | Browse, search, filter, details, track status | Browse, Home, Report details with the live progress timeline | Done |
 | Two roles: students and authorised staff | `AppUser.role`, staff approval (custom claim), role-based routing, staff dashboard and Review and update | Done |
-| Modern state management (Riverpod), logic outside widgets | `application/` providers and controllers | Done for auth and reports; continues |
+| Modern state management (Riverpod), logic outside widgets | `application/` providers and controllers | Done |
 | Firebase Authentication (email and password) | `AuthRepository`, verification, password reset | Done |
-| Cloud Firestore | `users`, `reports`, `reports/{id}/photos`, `reports/{id}/updates`, `users/{uid}/notifications`, `counters` | Done |
-| Basic widgets and layouts | all screens | Done so far |
+| Cloud Firestore | `users` (with `notifications`, `following`, private report links), `reports` (with `photos`, `updates`, `supporters`), `announcements`, `counters` | Done |
+| Basic widgets and layouts | all screens | Done |
 | Navigation | go_router, nav-bar shells, redirects | Done |
 | Forms with validation | sign in, sign up (email domain, live password checklist, confirm), New report (required fields, category, 300-character description, up to 3 photos) | Done |
 | Reusable components | `core/widgets`, component gallery | Done |
 | Asynchronous programming: loading, empty, error states | `AsyncValueView`, `LoadingState`, `EmptyState`, `ErrorState` | Components done; used on every data screen |
-| Security rules | [firestore.rules](firestore.rules) (accounts, report creation, photos, counter, staff updates, timeline, notifications) | In progress, finished in Milestone 6 |
+| Security rules | [firestore.rules](firestore.rules) (accounts, report creation, photos, counter, staff updates, timeline, notifications, Me too, confirm or reopen, announcements) | In progress, finished in Milestone 6 |
 | Extra features: anonymous reports (no id or name stored), urgency levels, readable ticket numbers, sort | New report, Browse | Done |
 | Extra features: staff notes, assignee, after photo, duplicates, notification fan-out | Review and update, `StaffRepository.saveUpdate` | Done |
-| Extra features: Me too, Notifications screen, confirm or reopen | Me too count and staff notes already show on Report details | Milestone 5 |
+| Extra features: Me too, notifications, confirm or reopen, announcements | Report details, Notifications, Profile | Done |
 | Extra: one-time email verification with 24-hour expiry | auth feature, admin script | Done |
