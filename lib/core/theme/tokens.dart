@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 /// and never hard-code a hex value.
 ///
 /// The dark palette is the original design. The light palette keeps the same
-/// roles, with accent text colours darkened so they stay readable (at least
-/// 4.5:1) on the pale base.
+/// roles on a warm beige base rather than near-white, which was glaring, with
+/// a soft cream highlight instead of pure white. Accent text colours are
+/// darkened so they stay readable (at least 4.5:1) on that base.
 @immutable
 class RipotiColors extends ThemeExtension<RipotiColors> {
   const RipotiColors({
@@ -104,9 +105,9 @@ class RipotiColors extends ThemeExtension<RipotiColors> {
   );
 
   static const light = RipotiColors(
-    base: Color(0xFFEDE5EB),
-    shadowDark: Color(0xFFC9BAC5),
-    shadowLight: Color(0xFFFFFFFF),
+    base: Color(0xFFE9E0D4),
+    shadowDark: Color(0xFFC8BBA9),
+    shadowLight: Color(0xFFF6F0E7),
     textPrimary: Color(0xFF2B2230),
     textSecondary: Color(0xFF6B5A68),
     textTertiary: Color(0xFF85747F),
@@ -121,9 +122,9 @@ class RipotiColors extends ThemeExtension<RipotiColors> {
     pinkLight: Color(0xFFA1366F),
     pinkFill: Color(0xFFF4A9D8),
     pinkMark: Color(0xFFD77BB5),
-    teal: Color(0xFF17706A),
-    divider: Color(0xFFDCD1D9),
-    track: Color(0xFFCFC1CB),
+    teal: Color(0xFF136660),
+    divider: Color(0xFFD8CDBF),
+    track: Color(0xFFCCBFAE),
     error: Color(0xFFB32D24),
     heroOverlay: Color(0x80180C1E),
     onHero: Color(0xFFFFFFFF),
