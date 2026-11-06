@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Staff dashboard</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#F0B45E}a:hover{color:#FFD08A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #2B2230; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #F3ECF1; position: relative; overflow: hidden">
+
+  <div style="display: flex; flex-direction: column; gap: 22px; padding: 22px 22px 130px 22px">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 13px; color: #B9A9B6; font-weight: 600">Facilities desk</span>
+        <span style="font-size: 24px; font-weight: 800; letter-spacing: -0.4px">Hello, Jean</span>
+      </div>
+      <a href="Profile.dc.html" aria-label="Your profile" style="width: 52px; height: 52px; border-radius: 26px; background: #2B2230; box-shadow: 5px 5px 12px #1A1420, -5px -5px 12px #3C3042; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #F0B45E; font-size: 16px; font-weight: 800">JH</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+      <div style="padding: 18px; border-radius: 24px; background: #680D4E; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 30px; font-weight: 800; line-height: 1; color: #FFFFFF">6</span>
+        <span style="font-size: 13px; font-weight: 600; color: #F1D9E8">New today</span>
+      </div>
+      <div style="padding: 18px; border-radius: 24px; background: #DB9734; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 30px; font-weight: 800; line-height: 1; color: #3A0A2C">9</span>
+        <span style="font-size: 13px; font-weight: 700; color: #3A0A2C">In progress</span>
+      </div>
+      <div style="padding: 18px; border-radius: 24px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 30px; font-weight: 800; line-height: 1">4</span>
+        <span style="font-size: 13px; font-weight: 600; color: #B9A9B6">Under review</span>
+      </div>
+      <div style="padding: 18px; border-radius: 24px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 30px; font-weight: 800; line-height: 1; color: #74D6CD">21</span>
+        <span style="font-size: 13px; font-weight: 600; color: #B9A9B6">Resolved this week</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 800">Report queue</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 6px; border-radius: 20px; box-shadow: inset 4px 4px 9px #1A1420, inset -4px -4px 9px #3C3042">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+          <button type="button" onClick="{{ t.pick }}" aria-pressed="{{ t.pressed }}" style="{{ t.style }}">{{ t.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px">
+        <sc-for list="{{ queue }}" as="q" hint-placeholder-count="3">
+          <a href="StaffDetail.dc.html" style="display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 24px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; text-decoration: none; color: #F3ECF1">
+            <span style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+              <span style="font-size: 11.5px; font-weight: 800; letter-spacing: 0.6px; color: #B9A9B6">{{ q.cat }} · {{ q.time }}</span>
+              <span style="{{ q.urgStyle }}">{{ q.urgency }}</span>
+            </span>
+            <span style="font-size: 15.5px; font-weight: 700; line-height: 1.3">{{ q.title }}</span>
+            <span style="font-size: 12.5px; color: #B9A9B6">{{ q.place }} · {{ q.status }} · {{ q.votes }} me too</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="Staff" style="position: absolute; left: 16px; right: 16px; bottom: 18px; height: 72px; border-radius: 26px; background: #2B2230; box-shadow: 8px 8px 18px #1A1420, -8px -8px 18px #3C3042; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; justify-items: center">
+    <a href="StaffHome.dc.html" aria-current="page" aria-label="Dashboard" style="width: 48px; height: 48px; border-radius: 16px; box-shadow: inset 3px 3px 7px #1A1420, inset -3px -3px 7px #3C3042; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F0B45E" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg>
+    </a>
+    <a href="Reports.dc.html" aria-label="All reports" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"></rect><path d="M9 8h6M9 12h6M9 16h3"></path></svg>
+    </a>
+    <a href="Profile.dc.html" aria-label="Profile" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'New' };
+  }
+  renderVals() {
+    const items = [
+      { title: 'Streetlight out on the main path', place: 'Main path', cat: 'SAFETY', time: '3h ago', urgency: 'High', status: 'Submitted', votes: 21, tab: 'New' },
+      { title: 'Power out in the library study room', place: 'Library L2', cat: 'POWER', time: '5h ago', urgency: 'High', status: 'Submitted', votes: 8, tab: 'New' },
+      { title: 'Blocked drain near the cafeteria', place: 'Cafeteria', cat: 'SANITATION', time: '2 days ago', urgency: 'Medium', status: 'Under review', votes: 5, tab: 'New' },
+      { title: 'Leaking tap in the Block C washroom', place: 'Block C', cat: 'WATER', time: '2h ago', urgency: 'Medium', status: 'In progress', votes: 12, tab: 'Mine' },
+      { title: 'Loose handrail on Hostel B stairs', place: 'Hostel B', cat: 'SAFETY', time: 'Yesterday', urgency: 'Low', status: 'In progress', votes: 4, tab: 'Mine' }
+    ];
+    const urg = {
+      High: 'background: #F4A9D8; color: #F3ECF1;',
+      Medium: 'background: #DB9734; color: #3A0A2C;',
+      Low: 'background: #2B2230; color: #D5C7D2; box-shadow: inset 2px 2px 5px #1A1420, inset -2px -2px 5px #3C3042;'
+    };
+    const tab = this.state.tab;
+    const queue = items.filter((i) => tab === 'All' || i.tab === tab).map((i) => ({
+      ...i,
+      urgStyle: 'height: 26px; padding: 0 12px; border-radius: 13px; font-size: 11.5px; font-weight: 800; display: inline-flex; align-items: center; flex-shrink: 0; ' + urg[i.urgency]
+    }));
+    const base = 'height: 44px; border: 0; border-radius: 15px; font-family: inherit; font-size: 13px; cursor: pointer;';
+    const tabs = [['New', 'New'], ['Mine', 'Mine'], ['All', 'All']].map(([id, label]) => ({
+      label,
+      pressed: id === tab ? 'true' : 'false',
+      pick: () => this.setState({ tab: id }),
+      style: base + (id === tab ? ' background: #2B2230; color: #F0B45E; font-weight: 800; box-shadow: 4px 4px 9px #1A1420, -4px -4px 9px #3C3042;' : ' background: transparent; color: #B9A9B6; font-weight: 700;')
+    }));
+    return { queue, tabs };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ripoti home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#F0B45E}a:hover{color:#FFD08A}
+input::placeholder{color:#9C8C99}
+.paint-bg{background-color:#3A1A40;background-image:url(../assets/paint-bg.png);background-size:cover;background-position:center}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #2B2230; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #F3ECF1; position: relative; overflow: hidden">
+
+  <div style="display: flex; flex-direction: column; gap: 24px; padding: 22px 22px 130px 22px">
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 13px; color: #B9A9B6; font-weight: 500">Good morning,</span>
+        <span style="font-size: 24px; font-weight: 800; letter-spacing: -0.4px">Amani</span>
+      </div>
+      <a href="Profile.dc.html" aria-label="Your profile" style="width: 52px; height: 52px; border-radius: 26px; background: #2B2230; box-shadow: 5px 5px 12px #1A1420, -5px -5px 12px #3C3042; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #F0B45E; font-size: 16px; font-weight: 800">AM</a>
+    </div>
+
+    <div style="height: 54px; border-radius: 20px; background: #2B2230; box-shadow: inset 4px 4px 9px #1A1420, inset -4px -4px 9px #3C3042; display: flex; align-items: center; gap: 10px; padding: 0 18px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+      <label for="search" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search reports</label>
+      <input id="search" type="search" placeholder="Search reports or places" style="flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: #F3ECF1">
+    </div>
+
+    <div class="paint-bg" style="border-radius: 28px; box-shadow: 8px 8px 18px #1A1420, -6px -6px 16px #3C3042; overflow: hidden">
+      <div style="padding: 22px; background: rgba(24,12,30,0.5); display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 19px; font-weight: 800; color: #FFFFFF; letter-spacing: -0.2px">Spotted a problem?</span>
+          <span style="font-size: 13.5px; color: #F3E6EF; line-height: 1.45">Snap a photo and report it in under a minute.</span>
+        </div>
+        <a href="NewReport.dc.html" style="align-self: flex-start; height: 42px; padding: 0 20px; border-radius: 14px; background: #DB9734; color: #2A1424; text-decoration: none; display: flex; align-items: center; font-size: 14px; font-weight: 800; box-shadow: 0 6px 14px rgba(0,0,0,0.35)">Report an issue</a>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+      <div style="padding: 18px; border-radius: 24px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 30px; font-weight: 800; line-height: 1; color: #F0B45E">2</span>
+        <span style="font-size: 13px; font-weight: 600; color: #B9A9B6">Open reports</span>
+      </div>
+      <div style="padding: 18px; border-radius: 24px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 30px; font-weight: 800; line-height: 1; color: #74D6CD">6</span>
+        <span style="font-size: 13px; font-weight: 600; color: #B9A9B6">Resolved</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <h2 style="margin: 0; font-size: 18px; font-weight: 800">Recent reports</h2>
+        <a href="Reports.dc.html" style="font-size: 13px; font-weight: 700; text-decoration: none; padding: 6px 0">View all</a>
+      </div>
+      <div style="display: flex; gap: 12px; margin: -8px -22px 0 -8px; padding: 8px 22px 8px 8px; overflow: hidden">
+        <sc-for list="{{ chips }}" as="chip" hint-placeholder-count="4">
+          <button type="button" onClick="{{ chip.pick }}" aria-pressed="{{ chip.pressed }}" style="{{ chip.style }}">{{ chip.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px">
+        <sc-for list="{{ reports }}" as="r" hint-placeholder-count="3">
+          <a href="Detail.dc.html" style="display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 24px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; text-decoration: none; color: #F3ECF1">
+            <span style="font-size: 11.5px; font-weight: 800; letter-spacing: 0.6px; color: #B9A9B6">{{ r.cat }}</span>
+            <span style="font-size: 15.5px; font-weight: 700; line-height: 1.3">{{ r.title }}</span>
+            <span style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+              <span style="font-size: 12.5px; color: #B9A9B6">{{ r.place }} · {{ r.time }}</span>
+              <span style="{{ r.pillStyle }}">{{ r.status }}</span>
+            </span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="position: absolute; left: 16px; right: 16px; bottom: 18px; height: 72px; border-radius: 26px; background: #2B2230; box-shadow: 8px 8px 18px #16101A, -6px -6px 16px #3C3042; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; justify-items: center">
+    <a href="Home.dc.html" aria-current="page" aria-label="Home" style="width: 48px; height: 48px; border-radius: 16px; box-shadow: inset 3px 3px 7px #1A1420, inset -3px -3px 7px #3C3042; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F0B45E" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v8a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2Z"></path></svg>
+    </a>
+    <a href="Reports.dc.html" aria-label="Reports" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"></rect><path d="M9 8h6M9 12h6M9 16h3"></path></svg>
+    </a>
+    <a href="NewReport.dc.html" aria-label="New report" style="width: 54px; height: 54px; border-radius: 18px; background: #DB9734; box-shadow: 4px 4px 10px #1A1420, -3px -3px 8px #3C3042; display: flex; align-items: center; justify-content: center">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2A1424" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+    </a>
+    <a href="Alerts.dc.html" aria-label="Notifications" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; position: relative">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9Z"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg>
+      <span style="position: absolute; top: 11px; right: 12px; width: 8px; height: 8px; border-radius: 4px; background: #DB9734"></span>
+    </a>
+    <a href="Profile.dc.html" aria-label="Profile" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { filter: 'All' };
+  }
+  renderVals() {
+    const all = [
+      { title: 'Leaking tap in the Block C washroom', place: 'Block C', time: '2h ago', status: 'In progress', cat: 'WATER' },
+      { title: 'Power out in the library study room', place: 'Library L2', time: '5h ago', status: 'Submitted', cat: 'POWER' },
+      { title: 'Broken chair in Room 204', place: 'Academic block', time: 'Yesterday', status: 'Resolved', cat: 'FURNITURE' },
+      { title: 'Blocked drain near the cafeteria', place: 'Cafeteria', time: '2 days ago', status: 'Submitted', cat: 'SANITATION' }
+    ];
+    const statusColor = { 'Submitted': '#F0B45E', 'In progress': '#F4A9D8', 'Resolved': '#74D6CD' };
+    const f = this.state.filter;
+    const reports = all.filter((r) => f === 'All' || r.status === f).map((r) => ({
+      ...r,
+      pillStyle: 'height: 28px; padding: 0 12px; border-radius: 14px; display: inline-flex; align-items: center; flex-shrink: 0; font-size: 12px; font-weight: 800; box-shadow: inset 2px 2px 5px #1A1420, inset -2px -2px 5px #3C3042; color: ' + statusColor[r.status] + ';'
+    }));
+    const chips = ['All', 'Submitted', 'In progress', 'Resolved'].map((label) => {
+      const on = label === f;
+      return {
+        label,
+        pressed: on ? 'true' : 'false',
+        pick: () => this.setState({ filter: label }),
+        style: 'height: 40px; padding: 0 18px; flex-shrink: 0; border: 0; border-radius: 20px; background: #2B2230; font-family: inherit; font-size: 13px; cursor: pointer; ' + (on ? 'box-shadow: inset 3px 3px 7px #1A1420, inset -3px -3px 7px #3C3042; color: #F0B45E; font-weight: 800;' : 'box-shadow: 4px 4px 10px #1A1420, -4px -4px 10px #3C3042; color: #D5C7D2; font-weight: 700;')
+      };
+    });
+    return { reports, chips };
+  }
+}
+</script>
+</body>
+</html>

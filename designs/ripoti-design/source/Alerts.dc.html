@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Notifications</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#F0B45E}a:hover{color:#FFD08A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #2B2230; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #F3ECF1; position: relative; overflow: hidden">
+
+  <div style="display: flex; flex-direction: column; gap: 20px; padding: 24px 22px 130px 22px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.4px">Notifications</h1>
+      <button type="button" style="height: 40px; border: 0; background: transparent; padding: 0; font-family: inherit; font-size: 13px; font-weight: 700; color: #F0B45E; cursor: pointer">Mark all read</button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 6px; padding: 20px; border-radius: 24px; background: #DB9734; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042">
+      <span style="font-size: 11.5px; font-weight: 800; color: #3A0A2C; letter-spacing: 0.6px">CAMPUS ANNOUNCEMENT</span>
+      <span style="font-size: 15px; font-weight: 700; color: #F3ECF1; line-height: 1.4">Planned water cut in Hostel A on Saturday, 9:00 to 12:00</span>
+    </div>
+
+    <h2 style="margin: 4px 0 0 0; font-size: 12px; font-weight: 800; color: #B9A9B6; letter-spacing: 0.6px">TODAY</h2>
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <a href="Detail.dc.html" style="display: flex; gap: 12px; align-items: flex-start; padding: 18px; border-radius: 24px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; text-decoration: none; color: #F3ECF1">
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 14.5px; line-height: 1.4; font-weight: 700">#1042 is now <span style="color: #F4A9D8">In progress</span></span>
+          <span style="font-size: 12.5px; color: #B9A9B6">Leaking tap in Block C · 9:30 AM</span>
+        </div>
+        <span style="width: 10px; height: 10px; border-radius: 5px; background: #DB9734; flex-shrink: 0; margin-top: 5px" aria-label="Unread"></span>
+      </a>
+      <a href="Detail.dc.html" style="display: flex; gap: 12px; align-items: flex-start; padding: 18px; border-radius: 24px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; text-decoration: none; color: #F3ECF1">
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 14.5px; line-height: 1.4; font-weight: 700">Facilities left a note: “Plumber on the way.”</span>
+          <span style="font-size: 12.5px; color: #B9A9B6">#1042 · 9:31 AM</span>
+        </div>
+        <span style="width: 10px; height: 10px; border-radius: 5px; background: #DB9734; flex-shrink: 0; margin-top: 5px" aria-label="Unread"></span>
+      </a>
+      <a href="Detail.dc.html" style="display: flex; flex-direction: column; gap: 4px; padding: 18px; border-radius: 24px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; text-decoration: none; color: #F3ECF1">
+        <span style="font-size: 14.5px; line-height: 1.4; font-weight: 500">12 students backed your report</span>
+        <span style="font-size: 12.5px; color: #B9A9B6">#1042 · 8:50 AM</span>
+      </a>
+    </div>
+
+    <h2 style="margin: 4px 0 0 0; font-size: 12px; font-weight: 800; color: #B9A9B6; letter-spacing: 0.6px">EARLIER</h2>
+    <div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 24px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span style="font-size: 14.5px; line-height: 1.4; font-weight: 500">#1038 was marked <b style="color: #74D6CD">Resolved</b>. Is it fixed?</span>
+        <span style="font-size: 12.5px; color: #B9A9B6">Broken chair in Room 204 · Yesterday</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <button type="button" style="height: 42px; border: 0; border-radius: 14px; background: #DB9734; color: #2A1424; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 10px #1A1420, -4px -4px 10px #3C3042">Yes, fixed</button>
+        <button type="button" style="height: 42px; border: 0; border-radius: 14px; background: #2B2230; color: #F3ECF1; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 4px 4px 10px #1A1420, -4px -4px 10px #3C3042">Reopen</button>
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="position: absolute; left: 16px; right: 16px; bottom: 18px; height: 72px; border-radius: 26px; background: #2B2230; box-shadow: 8px 8px 18px #1A1420, -8px -8px 18px #3C3042; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; justify-items: center">
+    <a href="Home.dc.html" aria-label="Home" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v8a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2Z"></path></svg>
+    </a>
+    <a href="Reports.dc.html" aria-label="Reports" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"></rect><path d="M9 8h6M9 12h6M9 16h3"></path></svg>
+    </a>
+    <a href="NewReport.dc.html" aria-label="New report" style="width: 54px; height: 54px; border-radius: 18px; background: #DB9734; box-shadow: 4px 4px 10px #1A1420, -4px -4px 10px #3C3042; display: flex; align-items: center; justify-content: center">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3A0A2C" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+    </a>
+    <a href="Alerts.dc.html" aria-current="page" aria-label="Notifications" style="width: 48px; height: 48px; border-radius: 16px; box-shadow: inset 3px 3px 7px #1A1420, inset -3px -3px 7px #3C3042; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F0B45E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9Z"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg>
+    </a>
+    <a href="Profile.dc.html" aria-label="Profile" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

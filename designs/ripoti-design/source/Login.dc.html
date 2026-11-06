@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ripoti sign in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#F0B45E}a:hover{color:#FFD08A}
+input::placeholder{color:#9C8C99}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #2B2230; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #F3ECF1; display: flex; flex-direction: column; gap: 28px; padding: 22px 24px 30px 24px; overflow: hidden">
+
+  <a href="Main.dc.html" aria-label="Back" style="width: 46px; height: 46px; border-radius: 16px; background: #2B2230; box-shadow: 5px 5px 12px #1A1420, -5px -5px 12px #3C3042; display: flex; align-items: center; justify-content: center">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F3ECF1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+  </a>
+
+  <div style="display: flex; flex-direction: column; gap: 18px; margin-top: 18px">
+    <div style="width: 64px; height: 64px; border-radius: 22px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; display: flex; align-items: center; justify-content: center">
+      <span style="width: 30px; height: 30px; border-radius: 10px; background: #680D4E"></span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 style="margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.5px">Welcome back</h1>
+      <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #B9A9B6">Sign in to report issues and follow their progress.</p>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 6px; border-radius: 20px; box-shadow: inset 4px 4px 9px #1A1420, inset -4px -4px 9px #3C3042">
+    <button type="button" onClick="{{ pickStudent }}" aria-pressed="{{ studentPressed }}" style="{{ studentStyle }}">Student</button>
+    <button type="button" onClick="{{ pickStaff }}" aria-pressed="{{ staffPressed }}" style="{{ staffStyle }}">Campus staff</button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <label for="email" style="font-size: 13.5px; font-weight: 700">Campus email</label>
+      <input id="email" type="email" placeholder="you@alustudent.com" style="height: 56px; box-sizing: border-box; border-radius: 18px; border: 0; background: #2B2230; box-shadow: inset 4px 4px 9px #1A1420, inset -4px -4px 9px #3C3042; padding: 0 18px; font: inherit; font-size: 15px; color: #F3ECF1; outline: none">
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <label for="password" style="font-size: 13.5px; font-weight: 700">Password</label>
+      <div style="height: 56px; border-radius: 18px; background: #2B2230; box-shadow: inset 4px 4px 9px #1A1420, inset -4px -4px 9px #3C3042; display: flex; align-items: center; padding: 0 8px 0 18px">
+        <input id="password" type="password" value="campus2026" style="flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-size: 15px; color: #F3ECF1; letter-spacing: 2px">
+        <button type="button" style="height: 44px; padding: 0 12px; border: 0; background: transparent; font-family: inherit; font-size: 13px; font-weight: 700; color: #F0B45E; cursor: pointer">Show</button>
+      </div>
+      <a href="#" style="align-self: flex-end; font-size: 13px; font-weight: 700; text-decoration: none; padding: 4px 0">Forgot password?</a>
+    </div>
+  </div>
+
+  <div style="margin-top: auto; display: flex; flex-direction: column; gap: 20px">
+    <a href="{{ ctaHref }}" style="height: 58px; border-radius: 20px; background: #DB9734; color: #2A1424; text-decoration: none; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; box-shadow: 6px 6px 14px #1A1420, -6px -6px 14px #3C3042">{{ ctaLabel }}</a>
+    <p style="margin: 0; text-align: center; font-size: 14px; color: #B9A9B6">New to Ripoti? <a href="Signup.dc.html" style="font-weight: 800; text-decoration: none">Create an account</a></p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { role: 'student' };
+  }
+  renderVals() {
+    const base = 'height: 46px; border: 0; border-radius: 15px; font-family: inherit; font-size: 14px; cursor: pointer;';
+    const on = base + ' background: #2B2230; color: #F0B45E; font-weight: 800; box-shadow: 4px 4px 9px #1A1420, -4px -4px 9px #3C3042;';
+    const off = base + ' background: transparent; color: #B9A9B6; font-weight: 700;';
+    const student = this.state.role === 'student';
+    return {
+      studentStyle: student ? on : off,
+      staffStyle: student ? off : on,
+      studentPressed: student ? 'true' : 'false',
+      staffPressed: student ? 'false' : 'true',
+      ctaLabel: student ? 'Sign in' : 'Sign in to staff dashboard',
+      ctaHref: student ? 'Home.dc.html' : 'StaffHome.dc.html',
+      pickStudent: () => this.setState({ role: 'student' }),
+      pickStaff: () => this.setState({ role: 'staff' })
+    };
+  }
+}
+</script>
+</body>
+</html>

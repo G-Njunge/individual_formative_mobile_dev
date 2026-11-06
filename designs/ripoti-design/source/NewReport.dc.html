@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>New report</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#F0B45E}a:hover{color:#FFD08A}
+input::placeholder,textarea::placeholder{color:#9C8C99}
+</style>
+</helmet>
+<div style="width: 390px; height: 1080px; box-sizing: border-box; background: #2B2230; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #F3ECF1; position: relative; overflow: hidden">
+
+  <div style="display: flex; flex-direction: column; gap: 26px; padding: 22px 22px 120px 22px">
+
+    <div style="display: flex; align-items: center; gap: 16px">
+      <a href="Home.dc.html" aria-label="Close" style="width: 46px; height: 46px; border-radius: 16px; background: #2B2230; box-shadow: 5px 5px 12px #1A1420, -5px -5px 12px #3C3042; display: flex; align-items: center; justify-content: center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F3ECF1" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </a>
+      <h1 style="margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.3px">New report</h1>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between">
+        <h2 style="margin: 0; font-size: 15px; font-weight: 800">Photos</h2>
+        <span style="font-size: 12px; color: #B9A9B6">Optional, up to 3</span>
+      </div>
+      <div style="display: flex; gap: 16px">
+        <div style="width: 110px; height: 110px; border-radius: 22px; padding: 6px; box-sizing: border-box; background: #2B2230; box-shadow: 6px 6px 14px #1A1420, -6px -6px 14px #3C3042; position: relative">
+          <svg width="98" height="98" viewBox="0 0 104 104" role="img" aria-label="Attached photo of a leaking tap" style="display: block; border-radius: 17px">
+            <rect width="104" height="104" fill="#EAF2F5"></rect>
+            <path d="M0 34h104M0 70h104M52 0v104" stroke="#DCE7EC" stroke-width="2"></path>
+            <rect x="30" y="20" width="44" height="9" rx="4.5" fill="#0A4D63"></rect>
+            <rect x="45" y="29" width="13" height="24" rx="3" fill="#8FA3AD"></rect>
+            <path d="M45 48h26a5 5 0 0 1 5 5v7h-8v-4H45Z" fill="#A9BAC2"></path>
+            <path d="M72 64c3 4 5 6.5 5 9a5 5 0 0 1-10 0c0-2.5 2-5 5-9Z" fill="#4FA3C0"></path>
+            <ellipse cx="60" cy="98" rx="30" ry="5" fill="#CFE3EA"></ellipse>
+          </svg>
+          <button type="button" aria-label="Remove photo" style="position: absolute; top: -6px; right: -6px; width: 28px; height: 28px; border-radius: 14px; border: 0; background: #DB9734; color: #2A1424; font-family: inherit; font-size: 15px; font-weight: 700; line-height: 1; cursor: pointer">×</button>
+        </div>
+        <button type="button" style="width: 110px; height: 110px; border-radius: 22px; border: 0; background: #2B2230; box-shadow: inset 5px 5px 11px #1A1420, inset -5px -5px 11px #3C3042; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-family: inherit; color: #F0B45E; cursor: pointer">
+          <span style="font-size: 28px; font-weight: 500; line-height: 1">+</span>
+          <span style="font-size: 12.5px; font-weight: 700">Add photo</span>
+        </button>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 800">Category</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+        <sc-for list="{{ cats }}" as="c" hint-placeholder-count="6">
+          <button type="button" onClick="{{ c.pick }}" aria-pressed="{{ c.pressed }}" style="{{ c.style }}">{{ c.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <label for="rtitle" style="font-size: 15px; font-weight: 800">Title</label>
+      <input id="rtitle" type="text" value="Leaking tap in the Block C washroom" style="height: 54px; box-sizing: border-box; border-radius: 18px; border: 0; background: #2B2230; box-shadow: inset 4px 4px 9px #1A1420, inset -4px -4px 9px #3C3042; padding: 0 18px; font: inherit; font-size: 15px; color: #F3ECF1; outline: none">
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <label for="rdesc" style="font-size: 15px; font-weight: 800">Description</label>
+      <textarea id="rdesc" rows="4" style="box-sizing: border-box; border-radius: 18px; border: 0; background: #2B2230; box-shadow: inset 4px 4px 9px #1A1420, inset -4px -4px 9px #3C3042; padding: 16px 18px; font: inherit; font-size: 14px; line-height: 1.5; color: #F3ECF1; resize: none; outline: none">The tap by the second sink is spraying water from the pipe. The floor is wet and slippery.</textarea>
+      <span style="align-self: flex-end; font-size: 12px; color: #B9A9B6">92 / 300</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <label for="rloc" style="font-size: 15px; font-weight: 800">Location</label>
+      <input id="rloc" type="text" value="Block C, ground floor washroom" style="height: 54px; box-sizing: border-box; border-radius: 18px; border: 0; background: #2B2230; box-shadow: inset 4px 4px 9px #1A1420, inset -4px -4px 9px #3C3042; padding: 0 18px; font: inherit; font-size: 15px; color: #F3ECF1; outline: none">
+      <button type="button" style="align-self: flex-start; height: 36px; padding: 0; border: 0; background: transparent; font-family: inherit; font-size: 13px; font-weight: 700; color: #F0B45E; cursor: pointer">Use my current location</button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 800">How urgent is it?</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 6px; border-radius: 20px; box-shadow: inset 4px 4px 9px #1A1420, inset -4px -4px 9px #3C3042">
+        <sc-for list="{{ levels }}" as="l" hint-placeholder-count="3">
+          <button type="button" onClick="{{ l.pick }}" aria-pressed="{{ l.pressed }}" style="{{ l.style }}">{{ l.label }}</button>
+        </sc-for>
+      </div>
+      <span style="font-size: 12.5px; color: #B9A9B6">{{ urgencyHint }}</span>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px; border-radius: 22px; background: #2B2230; box-shadow: 6px 6px 14px #1A1420, -6px -6px 14px #3C3042">
+      <div style="display: flex; flex-direction: column; gap: 3px">
+        <span style="font-size: 14.5px; font-weight: 700">Report anonymously</span>
+        <span style="font-size: 12.5px; color: #B9A9B6">Staff will not see your name</span>
+      </div>
+      <button type="button" role="switch" aria-checked="{{ anonLabel }}" aria-label="Report anonymously" onClick="{{ toggleAnon }}" style="{{ anonTrack }}">
+        <span style="width: 26px; height: 26px; border-radius: 13px; background: #2B2230; box-shadow: 2px 2px 5px #1A1420, -2px -2px 5px #3C3042"></span>
+      </button>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 22px; right: 22px; bottom: 26px">
+    <a href="Submitted.dc.html" style="height: 58px; border-radius: 20px; background: #DB9734; color: #2A1424; text-decoration: none; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; box-shadow: 6px 6px 14px #1A1420, -6px -6px 14px #3C3042">Submit report</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1080}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cat: 'Water', urgency: 'Medium', anon: false };
+  }
+  renderVals() {
+    const raised = 'box-shadow: 5px 5px 12px #1A1420, -5px -5px 12px #3C3042; color: #F3ECF1; font-weight: 700;';
+    const pressed = 'box-shadow: inset 4px 4px 9px #1A1420, inset -4px -4px 9px #3C3042; color: #F0B45E; font-weight: 800;';
+    const cats = ['Water', 'Power', 'Furniture', 'Sanitation', 'Safety', 'Other'].map((label) => {
+      const on = label === this.state.cat;
+      return {
+        label,
+        pressed: on ? 'true' : 'false',
+        pick: () => this.setState({ cat: label }),
+        style: 'height: 50px; border: 0; border-radius: 16px; background: #2B2230; font-family: inherit; font-size: 13.5px; cursor: pointer; ' + (on ? pressed : raised)
+      };
+    });
+    const hints = { Low: 'Low: it can wait a few days.', Medium: 'Medium: it affects people today.', High: 'High: it is unsafe or blocks a whole building.' };
+    const levels = ['Low', 'Medium', 'High'].map((label) => {
+      const on = label === this.state.urgency;
+      return {
+        label,
+        pressed: on ? 'true' : 'false',
+        pick: () => this.setState({ urgency: label }),
+        style: 'height: 44px; border: 0; border-radius: 14px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; ' + (on ? 'background: #DB9734; color: #3A0A2C; box-shadow: 3px 3px 7px #1A1420, -3px -3px 7px #3C3042;' : 'background: transparent; color: #D5C7D2;')
+      };
+    });
+    const anon = this.state.anon;
+    return {
+      cats,
+      levels,
+      urgencyHint: hints[this.state.urgency],
+      anonLabel: anon ? 'true' : 'false',
+      toggleAnon: () => this.setState({ anon: !anon }),
+      anonTrack: 'width: 56px; height: 34px; flex-shrink: 0; border-radius: 17px; border: 0; padding: 4px; display: flex; cursor: pointer; ' + (anon ? 'background: #680D4E; justify-content: flex-end; box-shadow: inset 3px 3px 6px #4A0937;' : 'background: #2B2230; justify-content: flex-start; box-shadow: inset 3px 3px 7px #1A1420, inset -3px -3px 7px #3C3042;')
+    };
+  }
+}
+</script>
+</body>
+</html>

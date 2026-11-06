@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Onboarding carousel</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#F0B45E}a:hover{color:#FFD08A}
+</style>
+</helmet>
+<div style="background: #2B2230; width: 390px; height: 844px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #FFFFFF; position: relative; overflow: hidden">
+
+  <div style="position: relative; height: 100%; display: flex; flex-direction: column">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 22px 24px 0 24px">
+      <div style="display: flex; align-items: center; gap: 12px">
+        <div style="width: 38px; height: 38px; border-radius: 13px; background: #680D4E; border: 1px solid rgba(255,255,255,0.22); box-sizing: border-box"></div>
+        <span style="font-size: 20px; font-weight: 800; letter-spacing: -0.3px; color: #FFFFFF">Ripoti</span>
+      </div>
+      <a href="Login.dc.html" style="height: 40px; padding: 0 18px; border-radius: 20px; background: #2B2230; box-shadow: 5px 5px 12px #1A1420, -5px -5px 12px #3C3042; display: flex; align-items: center; font-size: 13px; font-weight: 700; text-decoration: none; color: #FFFFFF">Skip</a>
+    </div>
+
+    <div onPointerDown="{{ down }}" onPointerUp="{{ up }}" style="width: 390px; overflow: hidden; touch-action: pan-y; flex-shrink: 0">
+      <div style="{{ trackStyle }}">
+
+        <div style="width: 390px; flex-shrink: 0; display: flex; flex-direction: column">
+          <div style="margin: 26px 24px 0 24px; padding: 14px; border-radius: 36px; background: #2B2230; box-shadow: 12px 12px 24px #1A1420, -12px -12px 24px #3C3042">
+            <svg width="312" height="287" viewBox="20 52 370 340" role="img" aria-label="A student stops in a campus washroom, surprised, and points at a broken tap spraying water onto the floor" style="display: block">
+              <rect x="186" y="64" width="180" height="324" rx="22" fill="#F6F2F4"></rect>
+              <path d="M186 124h180M186 184h180M186 244h180M186 304h180M246 64v324M306 64v324" stroke="#E9E1E6" stroke-width="2"></path>
+              <rect x="226" y="236" width="120" height="22" rx="9" fill="#DDD1D8"></rect>
+              <path d="M236 258h100l-12 38h-76Z" fill="#CFC1CA"></path>
+              <rect x="276" y="294" width="20" height="92" rx="4" fill="#DDD1D8"></rect>
+              <rect x="279" y="160" width="14" height="44" rx="4" fill="#8FA3AD"></rect>
+              <path d="M279 196h36a6 6 0 0 1 6 6v10h-10v-6h-32Z" fill="#A9BAC2"></path>
+              <rect x="270" y="152" width="32" height="8" rx="4" fill="#0A4D63"></rect>
+              <path d="M294 180q14-16 34-14M294 182q20-4 36 6" stroke="#4FA3C0" stroke-width="2" stroke-linecap="round" fill="none" stroke-dasharray="3 4"></path>
+              <path d="M316 216c2.5 3.5 4 5.5 4 7.5a4 4 0 0 1-8 0c0-2 1.5-4 4-7.5Z" fill="#4FA3C0"></path>
+              <ellipse cx="282" cy="388" rx="84" ry="7" fill="#CFE0E7"></ellipse>
+              <g transform="translate(112 0)">
+                <ellipse cx="0" cy="390" rx="44" ry="5" fill="rgba(0,0,0,0.25)"></ellipse>
+                <path d="M-22 230L4 230L-6 380L-26 380Z" fill="#540A3E"></path>
+                <path d="M-4 230L24 230L30 380L10 380Z" fill="#680D4E"></path>
+                <rect x="-38" y="376" width="34" height="12" rx="6" fill="#FFFFFF"></rect>
+                <rect x="6" y="376" width="38" height="12" rx="6" fill="#FFFFFF"></rect>
+                <rect x="-4" y="108" width="10" height="28" rx="3" fill="#5A3420"></rect>
+                <path d="M-26 152Q-25 134 -10 132L12 132Q26 134 27 152L30 238L-28 238Z" fill="#DB9734"></path>
+                <rect x="-28" y="228" width="58" height="10" rx="3" fill="#C4812A"></rect>
+                <path d="M-6 132Q1 142 8 132Z" fill="#5A3420"></path>
+                <circle cx="2" cy="100" r="13" fill="#6B3F26"></circle>
+                <circle cx="-4" cy="82" r="16" fill="#1C1216"></circle>
+                <circle cx="9" cy="85" r="11" fill="#1C1216"></circle>
+                <circle cx="-15" cy="93" r="9" fill="#1C1216"></circle>
+                <circle cx="-11" cy="104" r="5" fill="#1C1216"></circle>
+                <circle cx="-6" cy="103" r="3.5" fill="#5A3420"></circle>
+                <circle cx="10" cy="99" r="1.7" fill="#1C1216"></circle>
+                <ellipse cx="13" cy="107" rx="1.8" ry="2.4" fill="#1C1216"></ellipse>
+                <path d="M-18 146L-8 186" stroke="#C4812A" stroke-width="14" stroke-linecap="round"></path>
+                <path d="M-8 186L12 122" stroke="#6B3F26" stroke-width="9" stroke-linecap="round"></path>
+                <circle cx="14" cy="118" r="7.5" fill="#6B3F26"></circle>
+                <path d="M18 144L44 170" stroke="#C4812A" stroke-width="14" stroke-linecap="round"></path>
+                <path d="M44 170L70 150" stroke="#6B3F26" stroke-width="9" stroke-linecap="round"></path>
+                <circle cx="72" cy="148" r="7.5" fill="#6B3F26"></circle>
+                <path d="M76 145L88 138" stroke="#6B3F26" stroke-width="5" stroke-linecap="round"></path>
+              </g>
+            </svg>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px; padding: 30px 28px 0 28px">
+            <h1 style="margin: 0; font-size: 30px; line-height: 1.15; font-weight: 800; letter-spacing: -0.6px; color: #FFFFFF">Spot something<br><span style="color: #F0B45E">broken on campus?</span></h1>
+            <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #B9A9B6">Leaking taps, power cuts, broken chairs, unsafe paths. If it gets in the way of campus life, report it.</p>
+          </div>
+        </div>
+
+        <div style="width: 390px; flex-shrink: 0; display: flex; flex-direction: column">
+          <div style="margin: 26px 24px 0 24px; padding: 14px; border-radius: 36px; background: #2B2230; box-shadow: 12px 12px 24px #1A1420, -12px -12px 24px #3C3042">
+            <svg width="312" height="287" viewBox="20 52 370 340" role="img" aria-label="The student photographs the broken tap with her phone" style="display: block">
+              <rect x="210" y="150" width="160" height="238" rx="20" fill="#F6F2F4"></rect>
+              <path d="M210 210h160M210 270h160M210 330h160M290 150v238" stroke="#E9E1E6" stroke-width="2"></path>
+              <rect x="236" y="268" width="112" height="20" rx="8" fill="#DDD1D8"></rect>
+              <path d="M246 288h92l-10 34h-72Z" fill="#CFC1CA"></path>
+              <rect x="282" y="320" width="20" height="66" rx="4" fill="#DDD1D8"></rect>
+              <rect x="285" y="200" width="14" height="40" rx="4" fill="#8FA3AD"></rect>
+              <path d="M285 232h34a6 6 0 0 1 6 6v8h-10v-4h-30Z" fill="#A9BAC2"></path>
+              <rect x="276" y="193" width="32" height="8" rx="4" fill="#0A4D63"></rect>
+              <path d="M300 214q12-14 30-12" stroke="#4FA3C0" stroke-width="2" stroke-linecap="round" fill="none" stroke-dasharray="3 4"></path>
+              <path d="M320 250c2.5 3.5 4 5.5 4 7.5a4 4 0 0 1-8 0c0-2 1.5-4 4-7.5Z" fill="#4FA3C0"></path>
+              <ellipse cx="292" cy="388" rx="62" ry="7" fill="#CFE0E7"></ellipse>
+              <path d="M266 194v-12h12M334 182h12v12M346 254v12h-12M278 266h-12v-12" stroke="#DB9734" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+              <g transform="translate(100 0)">
+                <ellipse cx="0" cy="390" rx="44" ry="5" fill="rgba(0,0,0,0.25)"></ellipse>
+                <path d="M-20 230L2 230L-2 380L-20 380Z" fill="#540A3E"></path>
+                <path d="M0 230L24 230L24 380L6 380Z" fill="#680D4E"></path>
+                <rect x="-32" y="376" width="32" height="12" rx="6" fill="#FFFFFF"></rect>
+                <rect x="2" y="376" width="36" height="12" rx="6" fill="#FFFFFF"></rect>
+                <path d="M-16 146L10 182" stroke="#A86A1F" stroke-width="13" stroke-linecap="round"></path>
+                <path d="M10 182L48 152" stroke="#5A3420" stroke-width="9" stroke-linecap="round"></path>
+                <circle cx="50" cy="150" r="7.5" fill="#5A3420"></circle>
+                <rect x="-4" y="108" width="10" height="28" rx="3" fill="#5A3420"></rect>
+                <path d="M-26 152Q-25 134 -10 132L12 132Q26 134 27 152L30 238L-28 238Z" fill="#DB9734"></path>
+                <rect x="-28" y="228" width="58" height="10" rx="3" fill="#C4812A"></rect>
+                <path d="M-6 132Q1 142 8 132Z" fill="#5A3420"></path>
+                <path d="M-20 138L22 212" stroke="#0A4D63" stroke-width="4" stroke-linecap="round"></path>
+                <rect x="12" y="208" width="24" height="20" rx="6" fill="#0A4D63"></rect>
+                <circle cx="2" cy="100" r="13" fill="#6B3F26"></circle>
+                <circle cx="-4" cy="82" r="16" fill="#1C1216"></circle>
+                <circle cx="9" cy="85" r="11" fill="#1C1216"></circle>
+                <circle cx="-15" cy="93" r="9" fill="#1C1216"></circle>
+                <circle cx="-11" cy="104" r="5" fill="#1C1216"></circle>
+                <circle cx="-6" cy="103" r="3.5" fill="#5A3420"></circle>
+                <circle cx="10" cy="99" r="1.7" fill="#1C1216"></circle>
+                <path d="M8 107q3 2 6 0" stroke="#1C1216" stroke-width="1.5" fill="none" stroke-linecap="round"></path>
+                <path d="M18 144L38 178" stroke="#C4812A" stroke-width="14" stroke-linecap="round"></path>
+                <path d="M38 178L56 148" stroke="#6B3F26" stroke-width="9" stroke-linecap="round"></path>
+                <g transform="rotate(-12 58 136)">
+                  <rect x="49" y="118" width="19" height="34" rx="4" fill="#2A1424"></rect>
+                </g>
+                <circle cx="55" cy="148" r="7.5" fill="#6B3F26"></circle>
+              </g>
+            </svg>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px; padding: 30px 28px 0 28px">
+            <h1 style="margin: 0; font-size: 30px; line-height: 1.15; font-weight: 800; letter-spacing: -0.6px; color: #FFFFFF">Snap it.<br><span style="color: #F0B45E">Report it.</span></h1>
+            <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #B9A9B6">Take a photo, pick a category and add a short note. Your report reaches campus staff in seconds.</p>
+          </div>
+        </div>
+
+        <div style="width: 390px; flex-shrink: 0; display: flex; flex-direction: column">
+          <div style="margin: 26px 24px 0 24px; padding: 14px; border-radius: 36px; background: #2B2230; box-shadow: 12px 12px 24px #1A1420, -12px -12px 24px #3C3042">
+            <svg width="312" height="287" viewBox="20 52 370 340" role="img" aria-label="A campus technician tightens the repaired tap while the student gives a thumbs up, holding her phone that shows the report as resolved" style="display: block">
+              <rect x="286" y="140" width="100" height="248" rx="18" fill="#F6F2F4"></rect>
+              <path d="M286 200h100M286 260h100M286 320h100M336 140v248" stroke="#E9E1E6" stroke-width="2"></path>
+              <rect x="296" y="268" width="90" height="20" rx="8" fill="#DDD1D8"></rect>
+              <path d="M304 288h74l-8 34h-58Z" fill="#CFC1CA"></path>
+              <rect x="332" y="320" width="18" height="66" rx="4" fill="#DDD1D8"></rect>
+              <rect x="334" y="200" width="14" height="40" rx="4" fill="#8FA3AD"></rect>
+              <path d="M334 232h30a6 6 0 0 1 6 6v8h-10v-4h-26Z" fill="#A9BAC2"></path>
+              <rect x="325" y="193" width="32" height="8" rx="4" fill="#0A4D63"></rect>
+              <rect x="331" y="220" width="20" height="7" rx="2" fill="#DB9734"></rect>
+              <g transform="translate(76 0)">
+                <ellipse cx="0" cy="390" rx="44" ry="5" fill="rgba(0,0,0,0.25)"></ellipse>
+                <path d="M-20 230L2 230L-2 380L-20 380Z" fill="#540A3E"></path>
+                <path d="M0 230L24 230L24 380L6 380Z" fill="#680D4E"></path>
+                <rect x="-32" y="376" width="32" height="12" rx="6" fill="#FFFFFF"></rect>
+                <rect x="2" y="376" width="36" height="12" rx="6" fill="#FFFFFF"></rect>
+                <rect x="-4" y="108" width="10" height="28" rx="3" fill="#5A3420"></rect>
+                <path d="M-26 152Q-25 134 -10 132L12 132Q26 134 27 152L30 238L-28 238Z" fill="#DB9734"></path>
+                <rect x="-28" y="228" width="58" height="10" rx="3" fill="#C4812A"></rect>
+                <path d="M-6 132Q1 142 8 132Z" fill="#5A3420"></path>
+                <circle cx="2" cy="100" r="13" fill="#6B3F26"></circle>
+                <circle cx="-4" cy="82" r="16" fill="#1C1216"></circle>
+                <circle cx="9" cy="85" r="11" fill="#1C1216"></circle>
+                <circle cx="-15" cy="93" r="9" fill="#1C1216"></circle>
+                <circle cx="-11" cy="104" r="5" fill="#1C1216"></circle>
+                <circle cx="-6" cy="103" r="3.5" fill="#5A3420"></circle>
+                <path d="M7 99q3-3 6 0" stroke="#1C1216" stroke-width="1.6" fill="none" stroke-linecap="round"></path>
+                <path d="M6 105q6 7 12 0Z" fill="#1C1216"></path>
+                <path d="M-18 146L-28 186" stroke="#C4812A" stroke-width="14" stroke-linecap="round"></path>
+                <path d="M-28 186L-30 222" stroke="#6B3F26" stroke-width="9" stroke-linecap="round"></path>
+                <rect x="-50" y="206" width="22" height="36" rx="4" fill="#2A1424"></rect>
+                <rect x="-47.5" y="210" width="17" height="28" rx="2" fill="#DDF1EF"></rect>
+                <circle cx="-39" cy="221" r="5.5" fill="#08878A"></circle>
+                <path d="M-41.5 221l2 2 3.5-4" stroke="#FFFFFF" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path>
+                <circle cx="-29" cy="226" r="7.5" fill="#6B3F26"></circle>
+                <path d="M18 144L40 172" stroke="#C4812A" stroke-width="14" stroke-linecap="round"></path>
+                <path d="M40 172L44 132" stroke="#6B3F26" stroke-width="9" stroke-linecap="round"></path>
+                <circle cx="44" cy="126" r="8.5" fill="#6B3F26"></circle>
+                <rect x="40" y="110" width="7" height="14" rx="3.5" fill="#6B3F26"></rect>
+              </g>
+              <g transform="translate(250 0)">
+                <ellipse cx="0" cy="390" rx="44" ry="5" fill="rgba(0,0,0,0.25)"></ellipse>
+                <path d="M-22 228L24 228L24 380L6 380L1 280L-4 380L-22 380Z" fill="#0A4D63"></path>
+                <rect x="-32" y="374" width="32" height="14" rx="6" fill="#2A1424"></rect>
+                <rect x="2" y="374" width="36" height="14" rx="6" fill="#2A1424"></rect>
+                <rect x="-4" y="108" width="10" height="28" rx="3" fill="#74472B"></rect>
+                <path d="M-26 152Q-25 134 -10 132L12 132Q26 134 27 152L28 232L-26 232Z" fill="#08878A"></path>
+                <path d="M-16 166h32v68h-32Z" fill="#0A4D63"></path>
+                <path d="M-14 168L-18 136M14 168L18 136" stroke="#0A4D63" stroke-width="5" stroke-linecap="round"></path>
+                <circle cx="2" cy="100" r="13" fill="#8D5A3B"></circle>
+                <path d="M-11 95q-3 9 1 13h5v-13Z" fill="#1C1216"></path>
+                <circle cx="-7" cy="102" r="3.5" fill="#74472B"></circle>
+                <path d="M-12 96Q-11 82 3 82Q16 82 16 96Z" fill="#DB9734"></path>
+                <path d="M12 92h13a3 3 0 0 1 0 6H12Z" fill="#B87418"></path>
+                <circle cx="10" cy="102" r="1.6" fill="#1C1216"></circle>
+                <path d="M6 108q5-4 10 0q-5 2.5-10 0Z" fill="#1C1216"></path>
+                <path d="M-20 146L-28 186" stroke="#067476" stroke-width="14" stroke-linecap="round"></path>
+                <path d="M-28 186L-26 222" stroke="#8D5A3B" stroke-width="9.5" stroke-linecap="round"></path>
+                <path d="M-38 228v-7h24v7" stroke="#B87418" stroke-width="3" fill="none"></path>
+                <rect x="-50" y="226" width="48" height="30" rx="6" fill="#DB9734"></rect>
+                <circle cx="-26" cy="226" r="8" fill="#8D5A3B"></circle>
+                <path d="M18 144L46 168" stroke="#067476" stroke-width="14" stroke-linecap="round"></path>
+                <path d="M46 168L74 210" stroke="#8D5A3B" stroke-width="9.5" stroke-linecap="round"></path>
+                <path d="M80 212L88 214" stroke="#8FA3AD" stroke-width="5" stroke-linecap="round"></path>
+                <circle cx="92" cy="214" r="6" fill="none" stroke="#8FA3AD" stroke-width="4"></circle>
+                <circle cx="76" cy="213" r="8" fill="#8D5A3B"></circle>
+              </g>
+            </svg>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px; padding: 30px 28px 0 28px">
+            <h1 style="margin: 0; font-size: 30px; line-height: 1.15; font-weight: 800; letter-spacing: -0.6px; color: #FFFFFF">Watch it<br><span style="color: #F0B45E">get fixed.</span></h1>
+            <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #B9A9B6">Follow every report from submitted to resolved, and get notified the moment something changes.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 22px; padding: 0 24px 28px 24px">
+      <div style="align-self: center; display: flex; gap: 6px; align-items: center; padding: 4px; border-radius: 14px; box-shadow: inset 3px 3px 6px #1A1420, inset -3px -3px 6px #3C3042">
+        <sc-for list="{{ dots }}" as="d" hint-placeholder-count="3">
+          <button type="button" onClick="{{ d.go }}" aria-label="{{ d.label }}" aria-current="{{ d.current }}" style="width: 30px; height: 24px; border: 0; padding: 0; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+            <span style="{{ d.style }}"></span>
+          </button>
+        </sc-for>
+      </div>
+      <a href="Signup.dc.html" style="height: 56px; border-radius: 20px; background: #DB9734; color: #2A1424; text-decoration: none; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; box-shadow: 6px 6px 14px #1A1420, -5px -5px 12px #3C3042">Get started</a>
+      <a href="Login.dc.html" style="height: 52px; border-radius: 20px; background: #2B2230; box-shadow: 5px 5px 12px #1A1420, -5px -5px 12px #3C3042; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; text-decoration: none; color: #FFFFFF">I already have an account</a>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"interval":{"editor":"range","min":2,"max":8,"step":0.5,"unit":"s","default":4},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { i: 0 };
+    this.sx = null;
+    this.timer = null;
+  }
+  componentDidMount() {
+    this.startTimer();
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+  startTimer() {
+    clearInterval(this.timer);
+    const ms = (this.props.interval ?? 4) * 1000;
+    this.timer = setInterval(() => {
+      this.setState((s) => ({ i: (s.i + 1) % 3 }));
+    }, ms);
+  }
+  go(i) {
+    this.setState({ i: (i + 3) % 3 });
+    this.startTimer();
+  }
+  renderVals() {
+    const i = this.state.i;
+    const dots = [0, 1, 2].map((n) => ({
+      go: () => this.go(n),
+      label: 'Go to slide ' + (n + 1) + ' of 3',
+      current: n === i ? 'true' : 'false',
+      style: 'display: block; height: 8px; border-radius: 4px; transition: width 0.3s ease, background 0.3s ease; ' + (n === i ? 'width: 24px; background: #DB9734;' : 'width: 8px; background: #4A3D50;')
+    }));
+    return {
+      trackStyle: 'display: flex; width: 1170px; transform: translateX(' + (-390 * i) + 'px); transition: transform 0.6s cubic-bezier(0.22, 0.8, 0.24, 1);',
+      dots,
+      down: (e) => { this.sx = e.clientX; },
+      up: (e) => {
+        if (this.sx === null) return;
+        const d = e.clientX - this.sx;
+        this.sx = null;
+        if (d < -40) this.go(i + 1);
+        else if (d > 40) this.go(i - 1);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

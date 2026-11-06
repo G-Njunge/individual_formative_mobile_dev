@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Browse reports</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#F0B45E}a:hover{color:#FFD08A}
+input::placeholder{color:#9C8C99}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #2B2230; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #F3ECF1; position: relative; overflow: hidden">
+
+  <div style="display: flex; flex-direction: column; gap: 22px; padding: 24px 22px 130px 22px">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.4px">Campus reports</h1>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 6px; border-radius: 20px; box-shadow: inset 4px 4px 9px #1A1420, inset -4px -4px 9px #3C3042">
+      <button type="button" onClick="{{ showAll }}" aria-pressed="{{ allPressed }}" style="{{ allTab }}">All reports</button>
+      <button type="button" onClick="{{ showMine }}" aria-pressed="{{ minePressed }}" style="{{ mineTab }}">My reports</button>
+    </div>
+
+    <div style="height: 54px; border-radius: 20px; background: #2B2230; box-shadow: inset 4px 4px 9px #1A1420, inset -4px -4px 9px #3C3042; display: flex; align-items: center; gap: 10px; padding: 0 18px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+      <label for="rsearch" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search reports</label>
+      <input id="rsearch" type="search" placeholder="Search by title or place" style="flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: #F3ECF1">
+    </div>
+
+    <div style="display: flex; gap: 12px; margin: -8px -22px 0 -8px; padding: 8px 22px 8px 8px; overflow: hidden">
+      <sc-for list="{{ chips }}" as="chip" hint-placeholder-count="4">
+        <button type="button" onClick="{{ chip.pick }}" aria-pressed="{{ chip.pressed }}" style="{{ chip.style }}">{{ chip.label }}</button>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <span style="font-size: 13px; font-weight: 700; color: #B9A9B6">{{ countLabel }}</span>
+      <button type="button" style="height: 36px; border: 0; background: transparent; padding: 0; font-family: inherit; font-size: 13px; font-weight: 700; color: #F0B45E; cursor: pointer">Newest first</button>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <sc-for list="{{ reports }}" as="r" hint-placeholder-count="4">
+        <a href="Detail.dc.html" style="display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 24px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; text-decoration: none; color: #F3ECF1">
+          <span style="display: flex; justify-content: space-between; gap: 8px">
+            <span style="font-size: 11.5px; font-weight: 800; letter-spacing: 0.6px; color: #B9A9B6">{{ r.cat }}</span>
+            <span style="font-size: 12px; font-weight: 700; color: #B9A9B6">{{ r.votes }} me too</span>
+          </span>
+          <span style="font-size: 15.5px; font-weight: 700; line-height: 1.3">{{ r.title }}</span>
+          <span style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+            <span style="font-size: 12.5px; color: #B9A9B6">{{ r.place }} · {{ r.time }}</span>
+            <span style="{{ r.pillStyle }}">{{ r.status }}</span>
+          </span>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="position: absolute; left: 16px; right: 16px; bottom: 18px; height: 72px; border-radius: 26px; background: #2B2230; box-shadow: 8px 8px 18px #1A1420, -8px -8px 18px #3C3042; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; justify-items: center">
+    <a href="Home.dc.html" aria-label="Home" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v8a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2Z"></path></svg>
+    </a>
+    <a href="Reports.dc.html" aria-current="page" aria-label="Reports" style="width: 48px; height: 48px; border-radius: 16px; box-shadow: inset 3px 3px 7px #1A1420, inset -3px -3px 7px #3C3042; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F0B45E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"></rect><path d="M9 8h6M9 12h6M9 16h3"></path></svg>
+    </a>
+    <a href="NewReport.dc.html" aria-label="New report" style="width: 54px; height: 54px; border-radius: 18px; background: #DB9734; box-shadow: 4px 4px 10px #1A1420, -4px -4px 10px #3C3042; display: flex; align-items: center; justify-content: center">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3A0A2C" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+    </a>
+    <a href="Alerts.dc.html" aria-label="Notifications" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; position: relative">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9Z"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg>
+      <span style="position: absolute; top: 11px; right: 12px; width: 8px; height: 8px; border-radius: 4px; background: #DB9734"></span>
+    </a>
+    <a href="Profile.dc.html" aria-label="Profile" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { filter: 'All', mine: false };
+  }
+  renderVals() {
+    const all = [
+      { title: 'Leaking tap in the Block C washroom', place: 'Block C', time: '2h ago', status: 'In progress', cat: 'WATER', votes: 12, mine: true },
+      { title: 'Streetlight out on the main path', place: 'Main path', time: '3h ago', status: 'Submitted', cat: 'SAFETY', votes: 21, mine: false },
+      { title: 'Power out in the library study room', place: 'Library L2', time: '5h ago', status: 'Submitted', cat: 'POWER', votes: 8, mine: false },
+      { title: 'Broken chair in Room 204', place: 'Academic block', time: 'Yesterday', status: 'Resolved', cat: 'FURNITURE', votes: 3, mine: true },
+      { title: 'Blocked drain near the cafeteria', place: 'Cafeteria', time: '2 days ago', status: 'Under review', cat: 'SANITATION', votes: 5, mine: false }
+    ];
+    const statusColor = { 'Submitted': '#F0B45E', 'Under review': '#D5C7D2', 'In progress': '#F4A9D8', 'Resolved': '#74D6CD' };
+    const f = this.state.filter;
+    const mine = this.state.mine;
+    const reports = all.filter((r) => (f === 'All' || r.status === f) && (!mine || r.mine)).map((r) => ({
+      ...r,
+      pillStyle: 'height: 28px; padding: 0 12px; border-radius: 14px; display: inline-flex; align-items: center; flex-shrink: 0; font-size: 12px; font-weight: 800; box-shadow: inset 2px 2px 5px #1A1420, inset -2px -2px 5px #3C3042; color: ' + statusColor[r.status] + ';'
+    }));
+    const chips = ['All', 'Submitted', 'Under review', 'In progress', 'Resolved'].map((label) => {
+      const on = label === f;
+      return {
+        label,
+        pressed: on ? 'true' : 'false',
+        pick: () => this.setState({ filter: label }),
+        style: 'height: 40px; padding: 0 18px; flex-shrink: 0; border: 0; border-radius: 20px; background: #2B2230; font-family: inherit; font-size: 13px; cursor: pointer; ' + (on ? 'box-shadow: inset 3px 3px 7px #1A1420, inset -3px -3px 7px #3C3042; color: #F0B45E; font-weight: 800;' : 'box-shadow: 4px 4px 10px #1A1420, -4px -4px 10px #3C3042; color: #D5C7D2; font-weight: 700;')
+      };
+    });
+    const base = 'height: 46px; border: 0; border-radius: 15px; font-family: inherit; font-size: 14px; cursor: pointer;';
+    const on = base + ' background: #2B2230; color: #F0B45E; font-weight: 800; box-shadow: 4px 4px 9px #1A1420, -4px -4px 9px #3C3042;';
+    const off = base + ' background: transparent; color: #B9A9B6; font-weight: 700;';
+    return {
+      reports,
+      chips,
+      countLabel: reports.length + (reports.length === 1 ? ' report' : ' reports'),
+      allTab: mine ? off : on,
+      mineTab: mine ? on : off,
+      allPressed: mine ? 'false' : 'true',
+      minePressed: mine ? 'true' : 'false',
+      showAll: () => this.setState({ mine: false }),
+      showMine: () => this.setState({ mine: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

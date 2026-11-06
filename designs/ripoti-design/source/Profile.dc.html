@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#F0B45E}a:hover{color:#FFD08A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #2B2230; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #F3ECF1; position: relative; overflow: hidden">
+
+  <div style="display: flex; flex-direction: column; gap: 22px; padding: 24px 22px 130px 22px">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.4px">Profile</h1>
+
+    <div style="display: flex; align-items: center; gap: 16px">
+      <div style="width: 78px; height: 78px; border-radius: 39px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+        <span style="width: 60px; height: 60px; border-radius: 30px; background: #DB9734; color: #2A1424; font-size: 20px; font-weight: 800; display: flex; align-items: center; justify-content: center">AM</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
+        <span style="font-size: 20px; font-weight: 800">Amani Mugisha</span>
+        <span style="font-size: 13px; color: #B9A9B6">a.mugisha@alustudent.com</span>
+        <span style="font-size: 12px; font-weight: 800; letter-spacing: 0.6px; color: #F0B45E">STUDENT</span>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+      <div style="padding: 16px 8px; border-radius: 22px; background: #2B2230; box-shadow: 6px 6px 14px #1A1420, -6px -6px 14px #3C3042; display: flex; flex-direction: column; align-items: center; gap: 2px">
+        <span style="font-size: 24px; font-weight: 800">8</span>
+        <span style="font-size: 12px; font-weight: 600; color: #B9A9B6">Reported</span>
+      </div>
+      <div style="padding: 16px 8px; border-radius: 22px; background: #2B2230; box-shadow: 6px 6px 14px #1A1420, -6px -6px 14px #3C3042; display: flex; flex-direction: column; align-items: center; gap: 2px">
+        <span style="font-size: 24px; font-weight: 800; color: #F0B45E">2</span>
+        <span style="font-size: 12px; font-weight: 600; color: #B9A9B6">Open</span>
+      </div>
+      <div style="padding: 16px 8px; border-radius: 22px; background: #2B2230; box-shadow: 6px 6px 14px #1A1420, -6px -6px 14px #3C3042; display: flex; flex-direction: column; align-items: center; gap: 2px">
+        <span style="font-size: 24px; font-weight: 800; color: #74D6CD">6</span>
+        <span style="font-size: 12px; font-weight: 600; color: #B9A9B6">Resolved</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; padding: 6px 18px; border-radius: 24px; background: #2B2230; box-shadow: 7px 7px 16px #1A1420, -7px -7px 16px #3C3042">
+      <a href="Reports.dc.html" style="height: 54px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: #F3ECF1; font-size: 14.5px; font-weight: 700; border-bottom: 1px solid #3A2F40">My reports <span style="color: #9C8C99; font-size: 18px" aria-hidden="true">›</span></a>
+      <a href="#" style="height: 54px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: #F3ECF1; font-size: 14.5px; font-weight: 700; border-bottom: 1px solid #3A2F40">Followed reports <span style="color: #9C8C99; font-size: 18px" aria-hidden="true">›</span></a>
+      <a href="#" style="height: 54px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: #F3ECF1; font-size: 14.5px; font-weight: 700; border-bottom: 1px solid #3A2F40">Notification settings <span style="color: #9C8C99; font-size: 18px" aria-hidden="true">›</span></a>
+      <div style="height: 54px; display: flex; align-items: center; justify-content: space-between; font-size: 14.5px; font-weight: 700; border-bottom: 1px solid #3A2F40">
+        Dark mode
+        <button type="button" role="switch" aria-checked="{{ darkLabel }}" aria-label="Dark mode" onClick="{{ toggleDark }}" style="{{ darkTrack }}"><span style="width: 24px; height: 24px; border-radius: 12px; background: #2B2230; box-shadow: 2px 2px 5px #1A1420, -2px -2px 5px #3C3042"></span></button>
+      </div>
+      <a href="#" style="height: 54px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: #F3ECF1; font-size: 14.5px; font-weight: 700">Help and FAQ <span style="color: #9C8C99; font-size: 18px" aria-hidden="true">›</span></a>
+    </div>
+
+    <a href="Login.dc.html" style="height: 54px; border-radius: 20px; background: #2B2230; box-shadow: 6px 6px 14px #1A1420, -6px -6px 14px #3C3042; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #FF8A80; font-size: 15px; font-weight: 800">Sign out</a>
+  </div>
+
+  <nav aria-label="Main" style="position: absolute; left: 16px; right: 16px; bottom: 18px; height: 72px; border-radius: 26px; background: #2B2230; box-shadow: 8px 8px 18px #1A1420, -8px -8px 18px #3C3042; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; justify-items: center">
+    <a href="Home.dc.html" aria-label="Home" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v8a2 2 0 0 1-2 2h-4v-6h-6v6H5a2 2 0 0 1-2-2Z"></path></svg>
+    </a>
+    <a href="Reports.dc.html" aria-label="Reports" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"></rect><path d="M9 8h6M9 12h6M9 16h3"></path></svg>
+    </a>
+    <a href="NewReport.dc.html" aria-label="New report" style="width: 54px; height: 54px; border-radius: 18px; background: #DB9734; box-shadow: 4px 4px 10px #1A1420, -4px -4px 10px #3C3042; display: flex; align-items: center; justify-content: center">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3A0A2C" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+    </a>
+    <a href="Alerts.dc.html" aria-label="Notifications" style="width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; position: relative">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9C8C99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9Z"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg>
+      <span style="position: absolute; top: 11px; right: 12px; width: 8px; height: 8px; border-radius: 4px; background: #DB9734"></span>
+    </a>
+    <a href="Profile.dc.html" aria-current="page" aria-label="Profile" style="width: 48px; height: 48px; border-radius: 16px; box-shadow: inset 3px 3px 7px #1A1420, inset -3px -3px 7px #3C3042; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F0B45E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { dark: false };
+  }
+  renderVals() {
+    const d = this.state.dark;
+    return {
+      darkLabel: d ? 'true' : 'false',
+      toggleDark: () => this.setState({ dark: !d }),
+      darkTrack: 'width: 54px; height: 32px; flex-shrink: 0; border-radius: 16px; border: 0; padding: 4px; display: flex; cursor: pointer; ' + (d ? 'background: #680D4E; justify-content: flex-end; box-shadow: inset 3px 3px 6px #4A0937;' : 'background: #2B2230; justify-content: flex-start; box-shadow: inset 3px 3px 7px #1A1420, inset -3px -3px 7px #3C3042;')
+    };
+  }
+}
+</script>
+</body>
+</html>
