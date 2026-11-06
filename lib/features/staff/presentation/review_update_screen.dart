@@ -22,6 +22,7 @@ import '../../auth/application/auth_providers.dart';
 import '../../reports/application/report_filters.dart';
 import '../../reports/application/report_providers.dart';
 import '../../reports/data/report.dart';
+import '../../reports/data/report_repository.dart';
 import '../application/staff_providers.dart';
 import '../data/staff_update.dart';
 
@@ -182,6 +183,7 @@ class _ReviewFormState extends ConsumerState<_ReviewForm> {
             ),
             const SizedBox(height: 22),
             _TicketSummary(report: report),
+            _ReopenReason(reportId: report.id, status: report.status),
             if (report.duplicateOf case final dup?) ...[
               const SizedBox(height: 12),
               Text(
@@ -411,6 +413,50 @@ class _TicketSummary extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// While a reopened report is waiting for staff again, shows why the
+/// reporter reopened it (their note on the timeline).
+class _ReopenReason extends ConsumerWidget {
+  const _ReopenReason({required this.reportId, required this.status});
+
+  final String reportId;
+  final ReportStatus status;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.colors;
+    final updates = ref.watch(reportUpdatesProvider(reportId)).value;
+    final last = updates == null || updates.isEmpty ? null : updates.last;
+    if (last == null ||
+        last.byName != ReportRepository.reopenedBy ||
+        status != ReportStatus.submitted) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(top: 14),
+      child: NeuSurface(
+        depth: NeuDepth.pressed,
+        shadow: NeuShadow.insetMedium,
+        radius: 18,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'REOPENED BY THE REPORTER',
+              style: AppText.categoryLabel.copyWith(color: c.amberLight),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              last.note ?? '',
+              style: AppText.body.copyWith(fontSize: 14, color: c.textBody),
+            ),
+          ],
+        ),
       ),
     );
   }

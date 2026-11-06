@@ -112,6 +112,21 @@ void main() {
     expect(find.text('WATER · MEDIUM'), findsOneWidget);
     expect(find.text('Block C · 12 me too'), findsOneWidget);
     expect(find.textContaining('Reported by Amani M.'), findsOneWidget);
+    expect(find.text('REOPENED BY THE REPORTER'), findsNothing);
+  });
+
+  testWidgets('shows why the reporter reopened it', (tester) async {
+    await db.collection('reports/r1/updates').add({
+      'status': 'submitted',
+      'previousStatus': 'resolved',
+      'note': 'Reopened: Still dripping at night',
+      'byUid': '',
+      'byName': 'Reporter',
+      'createdAt': DateTime(2026, 11, 6),
+    });
+    await pumpReview(tester);
+    expect(find.text('REOPENED BY THE REPORTER'), findsOneWidget);
+    expect(find.text('Reopened: Still dripping at night'), findsOneWidget);
   });
 
   testWidgets('saves a status, assignee and note, then goes back', (

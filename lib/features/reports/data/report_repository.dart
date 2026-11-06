@@ -51,9 +51,137 @@ class ReportRepository {
 
   /// Ids of the reports a student sent anonymously.
   Stream<Set<String>> watchAnonymousIds(String uid) =>
-      _ownedAnonymous(uid)
-          .snapshots()
-          .map((q) => {for (final d in q.docs) d.id});
+      watchAnonymousSeen(uid).map((m) => m.keys.toSet());
+
+  /// The student's anonymous reports, each with when they last read its
+  /// updates (null if never). Notifications for anonymous reports are built
+  /// on the phone from the timeline, so this is their "read" state.
+  Stream<Map<String, DateTime?>> watchAnonymousSeen(String uid) =>
+      _ownedAnonymous(uid).snapshots().map(
+        (q) => {
+          for (final d in q.docs)
+            d.id: (d.data()['seenAt'] as Timestamp?)?.toDate(),
+        },
+      );
+
+  /// Marks the updates on these anonymous reports as read.
+  Future<void> markAnonymousSeen(String uid, Iterable<String> reportIds) async {
+    final ids = reportIds.toList();
+    if (ids.isEmpty) return;
+    final batch = _db.batch();
+    for (final id in ids) {
+      batch.update(_ownedAnonymous(uid).doc(id), {
+        'seenAt': FieldValue.serverTimestamp(),
+      });
+    }
+    await _guard(batch.commit);
+  }
+
+  // ---------- Me too ----------
+
+  /// Private list of the reports a student backs ("Followed reports").
+  CollectionReference<Map<String, dynamic>> _following(String uid) =>
+      _db.collection('users').doc(uid).collection('following');
+
+  /// Whether this student has said "Me too" on the report.
+  Stream<bool> watchIsSupporter(String reportId, String uid) => _reports
+      .doc(reportId)
+      .collection('supporters')
+      .doc(uid)
+      .snapshots()
+      .map((s) => s.exists);
+
+  /// Ids of the reports this student backs.
+  Stream<Set<String>> watchFollowingIds(String uid) =>
+      _following(uid).snapshots().map((q) => {for (final d in q.docs) d.id});
+
+  /// Adds or removes a student's "Me too".
+  ///
+  /// Three writes in one batch: the supporter record (so each student
+  /// counts once, and staff can notify them), the student's private
+  /// "following" record, and the count going up or down by exactly one.
+  /// The count uses `FieldValue.increment`, so two students tapping at the
+  /// same moment both count. The rules check all three belong together.
+  Future<void> setSupport({
+    required String reportId,
+    required String uid,
+    required bool support,
+  }) async {
+    final reportRef = _reports.doc(reportId);
+    final supporter = reportRef.collection('supporters').doc(uid);
+    final following = _following(uid).doc(reportId);
+    final batch = _db.batch();
+    if (support) {
+      batch.set(supporter, {'createdAt': FieldValue.serverTimestamp()});
+      batch.set(following, {'createdAt': FieldValue.serverTimestamp()});
+    } else {
+      batch.delete(supporter);
+      batch.delete(following);
+    }
+    batch.update(reportRef, {
+      'meTooCount': FieldValue.increment(support ? 1 : -1),
+    });
+    await _guard(batch.commit);
+  }
+
+  // ---------- Confirm or reopen ----------
+
+  /// The reporter's "Yes, fixed".
+  Future<void> confirmFixed(String reportId) =>
+      _guard(() => _reports.doc(reportId).update({'confirmed': true}));
+
+  /// The reporter's "Reopen": back to Submitted, so it shows in the staff
+  /// "New" queue again, with their reason on the timeline. The entry names
+  /// "Reporter" and stores no user id, so reopening an anonymous report
+  /// doesn't reveal who sent it.
+  Future<void> reopen(String reportId, {required String reason}) {
+    final why = reason.trim();
+    if (why.length < minReopenReason) {
+      throw const UserFacingException(
+        "Say what's still wrong, so staff know what to look at.",
+      );
+    }
+    final reportRef = _reports.doc(reportId);
+    final batch = _db.batch()
+      ..update(reportRef, {
+        'status': ReportStatus.submitted.value,
+        'updatedAt': FieldValue.serverTimestamp(),
+      })
+      ..set(reportRef.collection('updates').doc(), {
+        ...ReportUpdate(
+          id: '',
+          status: ReportStatus.submitted,
+          previousStatus: ReportStatus.resolved,
+          note: 'Reopened: $why',
+          byUid: '',
+          byName: reopenedBy,
+        ).toJson(),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    return _guard(batch.commit);
+  }
+
+  /// Shortest reason accepted for "Reopen".
+  static const minReopenReason = 5;
+
+  /// Who a reopen is credited to on the timeline.
+  static const reopenedBy = 'Reporter';
+
+  /// Turns Firestore errors on student actions into readable messages.
+  static Future<T> _guard<T>(Future<T> Function() call) async {
+    try {
+      return await call();
+    } on FirebaseException catch (e) {
+      debugPrint('Report action failed: ${e.code}: ${e.message}');
+      final message = switch (e.code) {
+        'unavailable' || 'deadline-exceeded' =>
+          'No connection. Check your internet and try again.',
+        'permission-denied' => "That isn't possible on this report any more.",
+        _ => 'Something went wrong. Please try again.',
+      };
+      throw UserFacingException(kDebugMode ? '$message (${e.code})' : message);
+    }
+  }
 
   /// The given reports, live. Firestore's `whereIn` takes at most 30 ids,
   /// so longer lists are split into several queries and joined.

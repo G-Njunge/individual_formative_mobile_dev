@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../core/models/report_enums.dart';
 
-/// Who a report is assigned to (set by staff in Milestone 4).
+/// Who a report is assigned to (set by staff on "Review and update").
 class Assignee {
   const Assignee({required this.uid, required this.name, this.team});
 
@@ -63,6 +63,7 @@ class Report {
     this.meTooCount = 0,
     this.hasAfterPhoto = false,
     this.duplicateOf,
+    this.confirmed = false,
     this.createdAt,
     this.updatedAt,
   });
@@ -96,6 +97,14 @@ class Report {
   /// The earlier report this one repeats, if staff closed it as a duplicate.
   final DuplicateLink? duplicateOf;
 
+  /// The reporter said "Yes, fixed" after staff resolved it. A confirmed
+  /// report can't be reopened.
+  final bool confirmed;
+
+  /// Resolved by staff and waiting for the reporter's "Is it fixed?".
+  bool get awaitsConfirmation =>
+      status == ReportStatus.resolved && !confirmed && duplicateOf == null;
+
   /// Null for a moment after creation, until the server timestamp arrives.
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -127,6 +136,7 @@ class Report {
       meTooCount: (json['meTooCount'] as num?)?.toInt() ?? 0,
       hasAfterPhoto: (json['hasAfterPhoto'] as bool?) ?? false,
       duplicateOf: DuplicateLink.fromJson(json['duplicateOf']),
+      confirmed: (json['confirmed'] as bool?) ?? false,
       createdAt: (json['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (json['updatedAt'] as Timestamp?)?.toDate(),
     );
@@ -152,6 +162,7 @@ class Report {
     // list exactly which fields a new report may have).
     if (hasAfterPhoto) 'hasAfterPhoto': true,
     if (duplicateOf != null) 'duplicateOf': duplicateOf!.toJson(),
+    if (confirmed) 'confirmed': true,
   };
 }
 

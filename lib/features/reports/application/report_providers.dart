@@ -21,13 +21,14 @@ final allReportsProvider = StreamProvider.autoDispose<List<Report>>(
   (ref) => ref.watch(reportRepositoryProvider).watchAll(),
 );
 
-final _uidProvider = Provider.autoDispose<String?>(
+/// The signed-in user's id, or null.
+final currentUidProvider = Provider.autoDispose<String?>(
   (ref) => ref.watch(authUserProvider.select((u) => u.value?.uid)),
 );
 
 /// The signed-in student's named reports (they carry `reporterId`).
 final myNamedReportsProvider = StreamProvider.autoDispose<List<Report>>((ref) {
-  final uid = ref.watch(_uidProvider);
+  final uid = ref.watch(currentUidProvider);
   if (uid == null) return Stream.value(const []);
   return ref.watch(reportRepositoryProvider).watchNamedBy(uid);
 });
@@ -35,14 +36,14 @@ final myNamedReportsProvider = StreamProvider.autoDispose<List<Report>>((ref) {
 /// Ids of the reports the signed-in student sent anonymously, read from
 /// their private records.
 final myAnonymousIdsProvider = StreamProvider.autoDispose<Set<String>>((ref) {
-  final uid = ref.watch(_uidProvider);
+  final uid = ref.watch(currentUidProvider);
   if (uid == null) return Stream.value(const {});
   return ref.watch(reportRepositoryProvider).watchAnonymousIds(uid);
 });
 
 /// The anonymous reports themselves. When the id list changes, Riverpod
 /// drops the old query and opens a new one.
-final _myAnonymousReportsProvider = StreamProvider.autoDispose<List<Report>>((
+final myAnonymousReportsProvider = StreamProvider.autoDispose<List<Report>>((
   ref,
 ) {
   final ids = ref.watch(myAnonymousIdsProvider).value;
@@ -54,7 +55,7 @@ final _myAnonymousReportsProvider = StreamProvider.autoDispose<List<Report>>((
 /// Feeds Home and "My reports".
 final myReportsProvider = Provider.autoDispose<AsyncValue<List<Report>>>((ref) {
   final named = ref.watch(myNamedReportsProvider);
-  final anonymous = ref.watch(_myAnonymousReportsProvider);
+  final anonymous = ref.watch(myAnonymousReportsProvider);
   return switch ((named, anonymous)) {
     (AsyncData(value: final a), AsyncData(value: final b)) => AsyncData(
       filterReports([...a, ...b]),
@@ -79,7 +80,7 @@ void retryMyReports(WidgetRef ref) {
 /// same report always maps to the same provider.
 final isMyReportProvider = Provider.autoDispose
     .family<bool, ({String id, String? reporterId})>((ref, key) {
-      final uid = ref.watch(_uidProvider);
+      final uid = ref.watch(currentUidProvider);
       if (uid == null) return false;
       if (key.reporterId == uid) return true;
       return ref.watch(myAnonymousIdsProvider).value?.contains(key.id) ?? false;

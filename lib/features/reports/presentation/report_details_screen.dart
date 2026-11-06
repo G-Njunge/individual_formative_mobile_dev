@@ -16,9 +16,11 @@ import '../../../core/widgets/neu_card.dart';
 import '../../../core/widgets/neu_surface.dart';
 import '../../../core/widgets/pills.dart';
 import '../../../core/widgets/progress_timeline.dart';
+import '../application/report_actions.dart';
 import '../application/report_filters.dart';
 import '../application/report_providers.dart';
 import '../data/report.dart';
+import 'widgets/fix_check.dart';
 
 /// Everything about one report: photos, details, how many people back it,
 /// and the live progress timeline.
@@ -170,8 +172,42 @@ class _ReportBody extends ConsumerWidget {
           const SizedBox(height: AppSpacing.section),
           _AfterPhoto(reportId: report.id),
         ],
+        if (isMine && report.awaitsConfirmation) ...[
+          const SizedBox(height: AppSpacing.section),
+          NeuCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Is it fixed?',
+                  style: AppText.bodyStrong.copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Staff marked this resolved. Tell them if the problem is '
+                  'really gone.',
+                  style: AppText.meta.copyWith(color: c.textSecondary),
+                ),
+                const SizedBox(height: 14),
+                FixCheckButtons(reportId: report.id),
+              ],
+            ),
+          ),
+        ],
+        if (report.confirmed) ...[
+          const SizedBox(height: 14),
+          Text(
+            isMine
+                ? 'You confirmed it is fixed. Thank you.'
+                : 'The reporter confirmed it is fixed.',
+            style: AppText.meta.copyWith(color: c.teal),
+          ),
+        ],
         const SizedBox(height: AppSpacing.section),
-        _BackersCard(count: report.meTooCount),
+        _BackersCard(report: report, isMine: isMine),
         const SizedBox(height: AppSpacing.section),
         Semantics(
           header: true,
@@ -270,36 +306,222 @@ class _AfterPhoto extends ConsumerWidget {
   }
 }
 
-/// "12 students also see this issue". The Me too button that adds to the
-/// count arrives in Milestone 5.
-class _BackersCard extends StatelessWidget {
-  const _BackersCard({required this.count});
+/// "12 students also see this issue" with the Me too button. After a tap
+/// the button is pressed and reads "Added"; tapping it again asks before
+/// taking the support back. The reporter, and anyone once a report is
+/// resolved, sees the count only.
+class _BackersCard extends ConsumerWidget {
+  const _BackersCard({required this.report, required this.isMine});
 
-  final int count;
+  final Report report;
+  final bool isMine;
+
+  Future<void> _toggle(BuildContext context, WidgetRef ref, bool backed) async {
+    final controller = ref.read(reportActionsProvider(report.id).notifier);
+    if (backed) {
+      final remove = await showModalBottomSheet<bool>(
+        context: context,
+        builder: (_) => const _RemoveSupportSheet(),
+      );
+      if (remove != true) return;
+    }
+    final ok = await controller.setSupport(!backed);
+    if (ok && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            backed
+                ? 'Your support was removed.'
+                : "Added. You'll be told when staff update this report.",
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final c = context.colors;
+    final count = report.meTooCount;
+    final backed = ref.watch(isSupporterProvider(report.id)).value ?? false;
+    final action = ref.watch(reportActionsProvider(report.id));
+    final canBack =
+        !isMine && (backed || report.status != ReportStatus.resolved);
+
+    final (headline, detail) = switch ((count, backed)) {
+      (<= 1, true) => ('You', 'see this issue'),
+      (_, true) => ('$count students', 'including you, see this issue'),
+      (0, false) => ('No one else yet', 'has said they see this issue'),
+      (1, false) => ('1 student', 'also sees this issue'),
+      _ => ('$count students', 'also see this issue'),
+    };
+
+    return NeuCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Semantics(
+                  label: '$headline $detail',
+                  excludeSemantics: true,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        headline,
+                        style: AppText.bodyStrong.copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        detail,
+                        style: AppText.meta.copyWith(color: c.textSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (canBack) ...[
+                const SizedBox(width: 12),
+                _MeTooButton(
+                  added: backed,
+                  loading: action.isLoading,
+                  onTap: () => _toggle(context, ref, backed),
+                ),
+              ],
+            ],
+          ),
+          if (action.hasError) ...[
+            const SizedBox(height: 12),
+            Text(
+              friendlyErrorMessage(action.error!),
+              style: AppText.meta.copyWith(
+                color: c.error,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Amber "Me too", or pressed "Added" once the student backs the report.
+class _MeTooButton extends StatelessWidget {
+  const _MeTooButton({
+    required this.added,
+    required this.loading,
+    required this.onTap,
+  });
+
+  final bool added;
+  final bool loading;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final (headline, detail) = switch (count) {
-      0 => ('No one else yet', 'has said they see this issue'),
-      1 => ('1 student', 'also sees this issue'),
-      _ => ('$count students', 'also see this issue'),
-    };
-    return NeuCard(
-      semanticLabel: '$headline $detail',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            headline,
-            style: AppText.bodyStrong.copyWith(
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
+    return NeuPressable(
+      onTap: loading ? null : onTap,
+      toggled: added,
+      semanticLabel: added
+          ? 'Added. Tap to remove your support'
+          : 'Me too: I see this issue too',
+      builder: (context, pressed) {
+        final label = loading
+            ? SizedBox.square(
+                dimension: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.2,
+                  color: added ? c.amberLight : c.onAmber,
+                ),
+              )
+            : Text(
+                added ? 'Added' : 'Me too',
+                style: AppText.buttonSmall.copyWith(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w800,
+                  color: added ? c.amberLight : c.onAmber,
+                ),
+              );
+        if (added) {
+          return NeuSurface(
+            depth: NeuDepth.pressed,
+            shadow: NeuShadow.insetMedium,
+            radius: 16,
+            height: 46,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Center(widthFactor: 1, child: label),
+          );
+        }
+        return AnimatedOpacity(
+          duration: AppDurations.fast,
+          opacity: pressed ? 0.85 : 1,
+          child: Container(
+            height: 46,
+            padding: const EdgeInsets.symmetric(horizontal: 22),
+            decoration: BoxDecoration(
+              color: c.amber,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: NeuSurface.raisedShadows(c, NeuShadow.button),
             ),
+            child: Center(widthFactor: 1, child: label),
           ),
-          const SizedBox(height: 2),
-          Text(detail, style: AppText.meta.copyWith(color: c.textSecondary)),
-        ],
+        );
+      },
+    );
+  }
+}
+
+/// "Remove your support?" before undoing a Me too.
+class _RemoveSupportSheet extends StatelessWidget {
+  const _RemoveSupportSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Semantics(
+              header: true,
+              child: const Text(
+                'Remove your support?',
+                style: AppText.sectionHeading,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Your Me too will be taken off this report, the count goes '
+              "down by one, and you won't be told about its updates any more.",
+              style: AppText.body.copyWith(
+                fontSize: 14,
+                color: c.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 20),
+            SecondaryButton(
+              label: 'Remove my support',
+              foreground: c.error,
+              onPressed: () => Navigator.pop(context, true),
+            ),
+            const SizedBox(height: 12),
+            PrimaryButton(
+              label: 'Keep it',
+              size: ButtonSize.medium,
+              onPressed: () => Navigator.pop(context, false),
+            ),
+          ],
+        ),
       ),
     );
   }
